@@ -143,9 +143,7 @@ public class Game {
                 GFX.checkError("dispose");
             } catch(Exception ex) {
                 ex.printStackTrace(System.out);
-            } finally {
-                System.exit(0);
-            }
+            } 
         }
 
         @Override
