@@ -75,6 +75,20 @@ public class GameEditor implements org.jge.Game.GameLoop {
 
     private static final String PFX = "org.j3d.GameEditor.KEY.PFX";
 
+    private static class NodeComponentFactory {
+
+        public final Class<?> cls;
+
+        public NodeComponentFactory(Class<?> cls) {
+            this.cls = cls;
+        }
+
+        @Override
+        public String toString() {
+            return cls.getSimpleName();
+        }
+    }
+
     private static class TextAreaStream extends OutputStream {
 
         private JTextArea textArea;
@@ -117,7 +131,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private Scene scene = null;
     private Node selected = null;
     private Node clipboard = null;
-    private String[] componentFactories;
+    private NodeComponentFactory[] componentFactories;
     private JTree tree;
     private DefaultTreeModel model;
     private JPopupMenu menu;
@@ -135,13 +149,10 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private File playSceneFile = null;
     private File loadInstanceFile = null;
     private boolean paste = false;
-    private final String packageName;
     private Icon deleteIcon;
     private Icon addIcon;
 
-    public GameEditor(int w, int h, String packageName, boolean resizable, boolean fixedFrameRate, String ... componentFactories) {
-
-        this.packageName = packageName;
+    public GameEditor(int w, int h, boolean resizable, boolean fixedFrameRate, Class<?> ... componentFactories) throws Exception {
 
         try {
             deleteIcon = new ImageIcon(load("/org/jge/resources/delete.png"));
@@ -344,9 +355,12 @@ public class GameEditor implements org.jge.Game.GameLoop {
         
         System.setOut(new PrintStream(new TextAreaStream(consoleTextArea)));
 
-        this.componentFactories = componentFactories;
-        for(String factory : componentFactories) {
-            System.out.println("found component factory: " + factory);
+        this.componentFactories = new NodeComponentFactory[componentFactories.length];
+        for(int i = 0; i != componentFactories.length; i++) {
+            Class<?> factory = componentFactories[i];
+
+            System.out.println("found component factory: " + factory.getName());
+            this.componentFactories[i] = new NodeComponentFactory(factory);
         }
 
         model = new DefaultTreeModel(new DefaultMutableTreeNode());
@@ -413,7 +427,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                     }
 
                     try {
-                        node.renderable = Game.getInstance().getAssets().load(file);
+                        node.renderable = game.getAssets().load(file);
                         node.renderable = node.renderable.newInstance();
                         parent.addChild(node);
                     } catch(Exception ex) {
@@ -586,7 +600,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
     public void render() throws Exception {
         if(loadSceneFile != null) {
             try {
-                Game.getInstance().getAssets().clear();
+                game.getAssets().clear();
                 scene = Serializer.deserialize(true, loadSceneFile);
             } catch(Exception ex) {
                 ex.printStackTrace(System.out);
@@ -599,7 +613,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
         } else if(playSceneFile != null) {
             try {
                 scene = null;
-                Game.getInstance().getAssets().clear();
+                game.getAssets().clear();
                 scene = Serializer.deserialize(false, playSceneFile);
             } catch(Exception ex) {
                 ex.printStackTrace(System.out);
@@ -611,7 +625,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
             enableUI();
         } else if(loadTextureFile != null && selected != null) {
             try {
-                selected.texture = Game.getInstance().getAssets().load(loadTextureFile);
+                selected.texture = game.getAssets().load(loadTextureFile);
             } catch(Exception ex) {
                 ex.printStackTrace(System.out);
             } finally {
@@ -620,7 +634,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
         } else if(loadNodeFile != null) {
             Node node = null;
             try {
-                node = Game.getInstance().getAssets().load(loadNodeFile);
+                node = game.getAssets().load(loadNodeFile);
                 node = new Node(scene, node);
 
                 Node parent = scene.root;
@@ -640,7 +654,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
         } else if(loadInstanceFile != null) {
             Node node = new Node();
             try {
-                node.renderable = Game.getInstance().getAssets().load(loadInstanceFile);
+                node.renderable = game.getAssets().load(loadInstanceFile);
 
                 Node parent = scene.root;
 
@@ -681,7 +695,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                     select(node);
                     enableUI();
                 }
-                Game.getInstance().getSceneRenderer().render(scene);
+                game.getSceneRenderer().render(scene);
             } catch(Exception ex) {
                 ex.printStackTrace(System.out);
             }
@@ -694,7 +708,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                 if(f != null) {
                     try {
                         scene = null;
-                        Game.getInstance().getAssets().clear();
+                        game.getAssets().clear();
                         scene = Serializer.deserialize(false, f);
                     } catch(Exception ex) {
                         ex.printStackTrace(System.out);
@@ -1006,7 +1020,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                     JComboBox<String> combo = (JComboBox<String>)b.getClientProperty(PFX + ".COMBO");
                     
                     try {
-                        NodeComponent component = (NodeComponent)Class.forName(packageName + "." + (String)combo.getSelectedItem()).getConstructors()[0].newInstance();
+                        NodeComponent component = (NodeComponent)((NodeComponentFactory)combo.getSelectedItem()).cls.getConstructors()[0].newInstance();
 
                         selected.addComponent(scene, component);
 
@@ -1016,13 +1030,11 @@ public class GameEditor implements org.jge.Game.GameLoop {
                     }
                 }
             });
-            JComboBox<String> combo = new JComboBox<>();
+            JComboBox<NodeComponentFactory> combo = new JComboBox<>();
 
             button.setIcon(addIcon);
-
-            combo.setPrototypeDisplayValue("____________________________");
-            for(String c : componentFactories) {
-                combo.addItem(c.substring(c.lastIndexOf('.') + 1));
+            for(NodeComponentFactory factory : componentFactories) {
+                combo.addItem(factory);
             }
             combo.setSelectedIndex(0);
             flowPanel.add(combo);

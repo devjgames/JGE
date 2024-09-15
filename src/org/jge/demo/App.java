@@ -8,11 +8,11 @@ public class App {
     public static void main(String[] args) throws Exception {
         Utils.setLookAndFeel();
 
-        new GameEditor(800, 500, "org.jge.demo", true, true,
-            Player.class.getSimpleName(),
-            Rotator.class.getSimpleName(),
-            Sky.class.getSimpleName(),
-            Torch.class.getSimpleName()
+        new GameEditor(800, 500, true, true,
+            Player.class,
+            Rotator.class,
+            Sky.class,
+            Torch.class
         );
     }
 }

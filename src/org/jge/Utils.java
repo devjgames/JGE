@@ -173,7 +173,7 @@ public class Utils {
         }
     }
 
-        private static class DarkTheme extends DefaultMetalTheme {
+    private static class DarkTheme extends DefaultMetalTheme {
 
         public DarkTheme() {
 
