@@ -165,7 +165,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
         }
         paused = false;
 
-        frame = new JFrame("J3D-Editor");
+        frame = new JFrame("JGE-Editor");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
