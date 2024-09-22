@@ -48,7 +48,7 @@ public class Scene {
         return eye.sub(target, o);
     }
 
-    public File getLoadFIle() {
+    public File getLoadFile() {
         return loadFile;
     }
 

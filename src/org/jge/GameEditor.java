@@ -703,7 +703,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
             if(scene.isInDesign()) {
                 handleInput();
             } else {
-                File f = scene.getLoadFIle();
+                File f = scene.getLoadFile();
 
                 if(f != null) {
                     try {
