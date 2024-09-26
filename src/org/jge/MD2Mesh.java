@@ -127,8 +127,8 @@ public class MD2Mesh implements Renderable {
     private boolean looping;
     private float amount;
     private float[][] normals;
-    private final Vector<VertexPTN> vertices = new Vector<>();
-    private final Vector<Integer> indices = new Vector<>();
+    protected final Vector<VertexPTN> vertices = new Vector<>();
+    protected final Vector<Integer> indices = new Vector<>();
     private final AABB bounds = new AABB();
 
     public MD2Mesh(File file) throws Exception {
@@ -301,8 +301,8 @@ public class MD2Mesh implements Renderable {
     }
 
     @Override
-    public int render(Scene scene, Node node, Vector<Node> lights) {
-        LightRenderer renderer = Game.getInstance().getLightRenderer();
+    public int render(Scene scene, Node node, Vector<Node> lights) throws Exception {
+        LightRenderer renderer = Game.getInstance().getRenderer(LightRenderer.class);
 
         renderer.begin(scene.projection, scene.view, node.model, node.modelIT, lights, node.texture, node.ambientColor, node.diffuseColor);
         renderer.push(vertices, indices, indices.size());
@@ -312,7 +312,7 @@ public class MD2Mesh implements Renderable {
     }
 
     @Override
-    public void update(Scene scene, Node node) {
+    public void update(Scene scene, Node node) throws Exception {
         if(done) {
             return;
         }

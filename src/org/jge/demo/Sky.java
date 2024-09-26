@@ -10,7 +10,7 @@ public class Sky extends NodeComponent {
     public void start() throws Exception {
         if(!scene().isInDesign()) {
             node().position.set(scene().eye);
-            node().getChild(0).depthState = DepthState.NONE;
+            node().depthState = DepthState.NONE;
         }
     }
 

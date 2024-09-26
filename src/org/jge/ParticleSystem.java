@@ -68,7 +68,7 @@ public class ParticleSystem implements Renderable {
     }
 
     @Override
-    public void update(Scene scene, Node node) {
+    public void update(Scene scene, Node node) throws Exception {
 
         time = Game.getInstance().totalTime();
         int count = 0;
@@ -169,8 +169,8 @@ public class ParticleSystem implements Renderable {
     }
 
     @Override
-    public int render(Scene scene, Node node, Vector<Node> lights) {
-        ColorRenderer renderer = Game.getInstance().getColorRenderer();
+    public int render(Scene scene, Node node, Vector<Node> lights) throws Exception {
+        ColorRenderer renderer = Game.getInstance().getRenderer(ColorRenderer.class);
 
         renderer.begin(scene.projection, scene.view, node.model, node.texture);
         renderer.push(vertices, indices, particleCount * 6);

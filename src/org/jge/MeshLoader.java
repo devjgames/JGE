@@ -9,7 +9,7 @@ import java.util.Vector;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-public class NodeLoader implements AssetLoader {
+public class MeshLoader implements AssetLoader {
     
 
     @Override
@@ -18,7 +18,8 @@ public class NodeLoader implements AssetLoader {
         Vector<Vector3f> vList = new Vector<>();
         Vector<Vector2f> tList = new Vector<>();
         Vector<Vector3f> nList = new Vector<>();
-        Hashtable<String, Mesh> keyedMeshes = new Hashtable<>();
+        Mesh mesh = new Mesh(file);
+        Hashtable<String, Mesh.MeshPart> keyedMeshParts = new Hashtable<>();
         Hashtable<String, String> materials = new Hashtable<>();
         HashSet<String> textures = new HashSet<>();
         String material = "";
@@ -30,9 +31,9 @@ public class NodeLoader implements AssetLoader {
                 loadMaterials(new File(file.getParent(), tLine.substring(6).trim()), materials);
             } else if(tLine.startsWith("usemtl ")) {
                 material = materials.get(tLine.substring(6).trim());
-                if(!keyedMeshes.containsKey(material)) {
+                if(!keyedMeshParts.containsKey(material)) {
                     textures.add(material);
-                    keyedMeshes.put(material, new Mesh(null));
+                    keyedMeshParts.put(material, new Mesh.MeshPart());
                 }
             } else if (tLine.startsWith("v ")) {
                 vList.add(new Vector3f(Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])));
@@ -42,11 +43,11 @@ public class NodeLoader implements AssetLoader {
             } else if (tLine.startsWith("vn ")) {
                 nList.add(new Vector3f(Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3])));
             } else if (tLine.startsWith("f ")) {
-                if(!keyedMeshes.containsKey(material)) {
-                    keyedMeshes.put(material, new Mesh(null));
+                if(!keyedMeshParts.containsKey(material)) {
+                    keyedMeshParts.put(material, new Mesh.MeshPart());
                 }
-                Mesh mesh = keyedMeshes.get(material);
-                int bV = mesh.vertices.size();
+                Mesh.MeshPart meshPart = keyedMeshParts.get(material);
+                int bV = meshPart.vertices.size();
                 int tris = tokens.length - 3;
                 for (int i = 1; i != tokens.length; i++) {
                     String[] iTokens = tokens[i].split("[/]+");
@@ -58,42 +59,36 @@ public class NodeLoader implements AssetLoader {
                     vertex.position.set(vList.get(vI));
                     vertex.textureCoordinate.set(tList.get(tI));
                     vertex.normal.set(nList.get(nI));
-                    mesh.vertices.add(vertex);
+                    meshPart.vertices.add(vertex);
                 }
                 for (int i = 0; i != tris; i++) {
-                    mesh.indices.add(bV);
-                    mesh.indices.add(bV + i + 1);
-                    mesh.indices.add(bV + i + 2);
+                    meshPart.indices.add(bV);
+                    meshPart.indices.add(bV + i + 1);
+                    meshPart.indices.add(bV + i + 2);
                 }
             }
         }
-        Enumeration<String> keys = keyedMeshes.keys();
+        Enumeration<String> keys = keyedMeshParts.keys();
         Vector<String> sortedKeys = new Vector<>();
         while(keys.hasMoreElements()) {
             sortedKeys.add(keys.nextElement());
         }
         sortedKeys.sort((a, b) -> a.compareTo(b));
-        Node root = new Node();
 
-        root.name = IO.getFilenameWithoutExtension(file);
         for(String key : sortedKeys) {
-            Mesh mesh = keyedMeshes.get(key);
+            Mesh.MeshPart meshPart = keyedMeshParts.get(key);
 
-            if(mesh.indices.size() != 0) {
-                Node node = new Node();
-
-                node.name = key;
-                node.renderable = mesh;
+            if(meshPart.indices.size() != 0) {
                 if(textures.contains(key)) {
-                    node.texture = assets.load(IO.file(key));
-                    node.name = IO.getFilenameWithoutExtension(node.texture.file);
+                    meshPart.texture = assets.load(IO.file(key));
                 }
-                mesh.calcBounds();
-
-                root.addChild(node);
+                meshPart.calcBounds();
+                mesh.parts.add(meshPart);
             }
         }
-        return root;
+        mesh.calcBounds();
+
+        return mesh;
     }
 
     private void loadMaterials(File file, Hashtable<String, String> materials) throws Exception {

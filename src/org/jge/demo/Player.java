@@ -156,7 +156,7 @@ public class Player extends NodeComponent {
     public void renderSprites() throws Exception {
         Texture font = Game.getInstance().getAssets().load(IO.file("assets/font.png"));
         Texture icon = Game.getInstance().getAssets().load(IO.file("assets/player_i.png"));
-        SpriteRenderer renderer = Game.getInstance().getSpriteRenderer();
+        SpriteRenderer renderer = Game.getInstance().getRenderer(SpriteRenderer.class);
 
         renderer.beginSprite(font);
         renderer.push(

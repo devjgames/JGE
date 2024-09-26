@@ -13,9 +13,9 @@ public interface Renderable {
 
     Triangle getTriangle(Scene scene, Node node, int i, Triangle triangle);
 
-    void update(Scene scene, Node node);
+    void update(Scene scene, Node node) throws Exception;
 
-    int render(Scene scene, Node node, Vector<Node> lights);
+    int render(Scene scene, Node node, Vector<Node> lights) throws Exception;
     
     Renderable newInstance() throws Exception;
 }

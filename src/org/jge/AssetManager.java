@@ -18,8 +18,7 @@ public class AssetManager extends Resource {
     public AssetManager() {
         registerAssetLoader(".png", new Texture.Loader());
         registerAssetLoader(".wav", new SoundLoader());
-        registerAssetLoader(".obj", new NodeLoader());
-        registerAssetLoader(".ins", new InstanceLoader());
+        registerAssetLoader(".obj", new MeshLoader());
         registerAssetLoader(".md2", new MD2MeshLoader());
     }
 

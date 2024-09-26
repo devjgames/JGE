@@ -21,7 +21,6 @@ public class Scene {
     public final Matrix4f view = new Matrix4f();
     public final FrustumIntersection frustum = new FrustumIntersection();
     public final Node root = new Node();
-    public final Vector4f boundsColor = new Vector4f(1, 1, 1, 1);
     public final File file;
     public int snap = 1;
 

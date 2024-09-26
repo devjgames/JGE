@@ -86,7 +86,7 @@ public class SceneRenderer {
         CullState cullState = null;
         BlendState blendState = null;
 
-        LineRenderer lineRenderer = Game.getInstance().getLineRenderer();
+        LineRenderer lineRenderer = Game.getInstance().getRenderer(LineRenderer.class);
 
         trianglesRendered = 0;
 
@@ -120,7 +120,9 @@ public class SceneRenderer {
             trianglesRendered += node.render();
         }
 
-        Game.getInstance().getSpriteRenderer().begin();
+        SpriteRenderer spriteRenderer = Game.getInstance().getRenderer(SpriteRenderer.class);
+
+        spriteRenderer.begin();
         scene.root.traverse((n) -> {
             if(n.visible) {
                 n.renderSprites();
@@ -128,7 +130,7 @@ public class SceneRenderer {
             }
             return false;
         });
-        Game.getInstance().getSpriteRenderer().end();
+        spriteRenderer.end();
 
         scene.root.traverse((n) -> {
             for(int i = 0; i != n.getComponentCount(); i++) {

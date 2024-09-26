@@ -76,36 +76,6 @@ public class Serializer {
                     ex.printStackTrace(System.out);
                 }
             }
-            if(element.hasAttribute("vertices") && element.hasAttribute("indices")) {
-                String[] svertices = element.getAttribute("vertices").split("\\s+");
-                String[] sindices = element.getAttribute("indices").split("\\s");
-                Mesh mesh = new Mesh(null);
-
-                for(int i = 0; i != svertices.length; ) {
-                    float x = Float.parseFloat(svertices[i++]);
-                    float y = Float.parseFloat(svertices[i++]);
-                    float z = Float.parseFloat(svertices[i++]);
-                    float s = Float.parseFloat(svertices[i++]);
-                    float t = Float.parseFloat(svertices[i++]);
-                    float nx = Float.parseFloat(svertices[i++]);
-                    float ny = Float.parseFloat(svertices[i++]);
-                    float nz = Float.parseFloat(svertices[i++]);
-                    VertexPTN vertex = new VertexPTN();
-
-                    vertex.position.set(x, y, z);
-                    vertex.textureCoordinate.set(s, t);
-                    vertex.normal.set(nx, ny, nz);
-
-                    mesh.vertices.add(vertex);
-                }
-                mesh.calcBounds();
-
-                for(int i = 0; i != sindices.length; i++) {
-                    mesh.indices.add(Integer.parseInt(sindices[i]));
-                }
-                node.renderable = mesh;
-            }
-
             for(int i = 0; i != nodes.getLength(); i++) {
                 org.w3c.dom.Node xmlNode = nodes.item(i);
 
@@ -191,38 +161,9 @@ public class Serializer {
 
     private static void append(Node node, String indent, StringBuilder b) throws Exception {
         boolean empty = node.getChildCount() == 0 && node.getComponentCount() == 0;
-        Mesh mesh = null;
-
-        if(node.renderable instanceof Mesh) {
-            mesh = (Mesh)node.renderable;
-        }
 
         b.append(indent + "<node");
-        if(mesh != null) {
-            if(mesh.indices.size() != 0) {
-                b.append(" vertices=\"");
-                for(int i = 0; i != mesh.vertices.size(); i++) {
-                    VertexPTN v = mesh.vertices.get(i);
-
-                    if(i == 0) {
-                        b.append(Utils.toString(v, "position"));
-                    } else {
-                        b.append(" " + Utils.toString(v, "position"));
-                    }
-                    b.append(" " + Utils.toString(v, "textureCoordinate"));
-                    b.append(" " + Utils.toString(v, "normal"));
-                }
-                b.append("\" indices=\"");
-                for(int i = 0; i != mesh.indices.size(); i++) {
-                    if(i == 0) {
-                        b.append(mesh.indices.get(i));
-                    } else {
-                        b.append(" " + mesh.indices.get(i));
-                    }
-                }
-                b.append("\"");
-            }
-        } else if(node.renderable != null) {
+        if(node.renderable != null) {
             File file = node.renderable.getFile();
 
             if(file != null) {

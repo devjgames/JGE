@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 
 import com.jogamp.opengl.GL2;
 
-public class LineRenderer extends Resource {
+public class LineRenderer extends Renderer {
     
 
     private final VertexPTC vertex = new VertexPTC();

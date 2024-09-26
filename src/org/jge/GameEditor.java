@@ -145,9 +145,8 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private Vector3f point = new Vector3f();
     private File loadSceneFile = null;
     private File loadTextureFile = null;
-    private File loadNodeFile = null;
+    private File loadMeshFile = null;
     private File playSceneFile = null;
-    private File loadInstanceFile = null;
     private boolean paste = false;
     private Icon deleteIcon;
     private Icon addIcon;
@@ -409,7 +408,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                 File file = Utils.selectFile(frame, IO.file("assets"), ".obj");
 
                 if(file != null) {
-                    loadNodeFile = file;
+                    loadMeshFile = file;
                 }
             }
         }));
@@ -436,16 +435,6 @@ public class GameEditor implements org.jge.Game.GameLoop {
                     populateTree();
                     select(node);
                     enableUI();
-                }
-            }
-        }));
-        menu.add(new JMenuItem(new AbstractAction("Add Instance") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                File file = Utils.selectFile(frame, IO.file("assets"), ".ins");
-
-                if(file != null) {
-                    loadInstanceFile = file;
                 }
             }
         }));
@@ -631,11 +620,14 @@ public class GameEditor implements org.jge.Game.GameLoop {
             } finally {
                 loadTextureFile = null;
             }
-        } else if(loadNodeFile != null) {
+        } else if(loadMeshFile != null) {
             Node node = null;
             try {
-                node = game.getAssets().load(loadNodeFile);
-                node = new Node(scene, node);
+                Mesh mesh = game.getAssets().load(loadMeshFile);
+
+                node = new Node();
+                node.renderable = mesh;
+                node.name = IO.getFilenameWithoutExtension(loadMeshFile);
 
                 Node parent = scene.root;
 
@@ -646,31 +638,12 @@ public class GameEditor implements org.jge.Game.GameLoop {
             } catch(Exception ex) {
                 ex.printStackTrace(System.out);
             } finally {
-                loadNodeFile = null;
+                loadMeshFile = null;
             }
             populateTree();
             select(node);
             enableUI();
-        } else if(loadInstanceFile != null) {
-            Node node = new Node();
-            try {
-                node.renderable = game.getAssets().load(loadInstanceFile);
-
-                Node parent = scene.root;
-
-                if(selected != null) {
-                    parent = selected;
-                }
-                parent.addChild(node);;
-            } catch(Exception ex) {
-                ex.printStackTrace(System.out);
-            } finally {
-                loadInstanceFile = null;
-            }
-            populateTree();
-            select(node);
-            enableUI();
-        }
+        } 
         
         if(scene == null) {
             GFX.clear(0.2f, 0.2f, 0.2f, 1);

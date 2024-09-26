@@ -8,7 +8,7 @@ import org.joml.Matrix4f;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-public class ColorRenderer extends Resource {
+public class ColorRenderer extends Renderer {
 
     public static final int VERTEX_STRIDE = 9;
     

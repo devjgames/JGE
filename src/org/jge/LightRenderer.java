@@ -9,7 +9,7 @@ import org.joml.Vector4f;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-public class LightRenderer extends Resource {
+public class LightRenderer extends Renderer {
     
     public static final int VERTEX_STRIDE = 8;
     public static final int MAX_LIGHTS = 8;

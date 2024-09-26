@@ -10,6 +10,7 @@ import com.jogamp.opengl.GLProfile;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.HashSet;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -152,10 +153,6 @@ public class Game {
                 if(fixedFrameRate) {
                     getGL().setSwapInterval(1);
                 }
-                lineRenderer = resources.manage(new LineRenderer());
-                colorRenderer = resources.manage(new ColorRenderer());
-                lightRenderer = resources.manage(new LightRenderer());
-                spriteRenderer = resources.manage(new SpriteRenderer());
                 loop.init();
                 GFX.checkError("init");
             } catch(Exception ex) {
@@ -175,11 +172,8 @@ public class Game {
     private GameLoop loop;
     private ResourceManager resources = new ResourceManager();
     private AssetManager assets;
-    private SpriteRenderer spriteRenderer = null;
-    private LineRenderer lineRenderer = null;
-    private LightRenderer lightRenderer = null;
-    private ColorRenderer colorRenderer = null;
     private SceneRenderer sceneRenderer = new SceneRenderer();
+    private HashSet<Renderer> renderers = new HashSet<>();
     private int mouseX = 0;
     private int mouseY = 0;
     private int dX = 0;
@@ -242,20 +236,21 @@ public class Game {
         return sceneRenderer;
     }
 
-    public LineRenderer getLineRenderer() {
-        return lineRenderer;
-    }
+    @SuppressWarnings("unchecked")
+    public <T extends Renderer> T getRenderer(Class<? extends Renderer> cls) throws Exception {
+        for(Renderer renderer : renderers) {
+            if(cls.isAssignableFrom(renderer.getClass())) {
+                return (T)renderer;
+            }
+        }
 
-    public ColorRenderer getColorRenderer() {
-        return colorRenderer;
-    }
+        System.out.println("creating renderer - " + cls.getName() + " ...");
 
-    public LightRenderer getLightRenderer() {
-        return lightRenderer;
-    }
+        Renderer renderer = resources.manage((T)cls.getConstructors()[0].newInstance());
 
-    public SpriteRenderer getSpriteRenderer() {
-        return spriteRenderer;
+        renderers.add(renderer);
+
+        return (T)renderer;
     }
 
     public int mouseX() {
