@@ -29,10 +29,6 @@ public abstract class NodeComponent {
         this.node = node;
     }
 
-    public boolean renderable() {
-        return false;
-    }
-
     public void init() throws Exception {
     }
 

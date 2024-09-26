@@ -35,17 +35,12 @@ public class SceneRenderer {
                     if(n.renderable != null) {
                         renderables.add(n);
                     } else if(n.isLight) {
-                        lights.add(n);
                         if(scene.isInDesign()) {
                             renderables.add(n);
                         }
-                    } else {
-                        for(int i = 0; i != n.getComponentCount(); i++) {
-                            if(n.getComponent(i).renderable()) {
-                                renderables.add(n);
-                                break;
-                            }
-                        }
+                    }
+                    if(n.isLight) {
+                        lights.add(n);
                     }
                     return true;
                 }
