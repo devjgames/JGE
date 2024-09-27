@@ -3,6 +3,7 @@ package org.jge;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 import javax.imageio.ImageIO;
 
@@ -70,6 +71,32 @@ public class Texture extends Resource {
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT);
         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT);
         gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, w, h, 0, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, buf);
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
+    }
+
+    public Texture(int w, int h, ColorFormat format) {
+        GL2 gl = Game.getGL();
+
+        this.file = null;
+        this.w = w;
+        this.h = h;
+
+        int[] v = new int[1];
+
+        gl.glGenTextures(1, v, 0);
+        id = v[0];
+        gl.glBindTexture(GL2.GL_TEXTURE_2D, id);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
+        gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
+        if(format == ColorFormat.COLOR) {
+            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, w, h, 0, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, (ByteBuffer)null);
+        } else if(format == ColorFormat.FLOAT) {
+            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_R32F, w, h, 0, GL2.GL_RED, GL2.GL_FLOAT, (FloatBuffer)null);
+        } else {
+            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA32F, w, h, 0, GL2.GL_RGBA, GL2.GL_FLOAT, (FloatBuffer)null);
+        }
         gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
     }
 

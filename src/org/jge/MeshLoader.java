@@ -80,7 +80,13 @@ public class MeshLoader implements AssetLoader {
 
             if(meshPart.indices.size() != 0) {
                 if(textures.contains(key)) {
-                    meshPart.texture = assets.load(IO.file(key));
+                    File tfile;
+                    meshPart.texture = assets.load(tfile = IO.file(key));
+
+                    tfile = IO.file(tfile.getParentFile(), IO.getFilenameWithoutExtension(tfile) + "_DECAL.png");
+                    if(tfile.exists()) {
+                        meshPart.decal = assets.load(tfile);
+                    }
                 }
                 meshPart.calcBounds();
                 mesh.parts.add(meshPart);

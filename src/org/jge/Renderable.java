@@ -15,6 +15,8 @@ public interface Renderable {
 
     void update(Scene scene, Node node) throws Exception;
 
+    int renderShadowPass(Scene scene, Node node, Node light) throws Exception;
+
     int render(Scene scene, Node node, Vector<Node> lights) throws Exception;
     
     Renderable newInstance() throws Exception;

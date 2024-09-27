@@ -301,10 +301,22 @@ public class MD2Mesh implements Renderable {
     }
 
     @Override
+    public int renderShadowPass(Scene scene, Node node, Node light) throws Exception {
+        ShadowRenderer renderer = Game.getInstance().getRenderer(ShadowRenderer.class);
+
+        renderer.begin(node, light);
+        renderer.push(vertices, indices, indices.size());
+        renderer.end();
+
+        return getTriangleCount();
+    }
+
+
+    @Override
     public int render(Scene scene, Node node, Vector<Node> lights) throws Exception {
         LightRenderer renderer = Game.getInstance().getRenderer(LightRenderer.class);
 
-        renderer.begin(scene.projection, scene.view, node.model, node.modelIT, lights, node.texture, node.ambientColor, node.diffuseColor);
+        renderer.begin(scene.projection, scene.view, node.model, node.modelIT, lights, node.texture, node.decal, node.receivesShadow, node.ambientColor, node.diffuseColor);
         renderer.push(vertices, indices, indices.size());
         renderer.end();
 

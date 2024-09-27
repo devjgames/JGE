@@ -228,12 +228,20 @@ public class Game {
         return canvas;
     }
 
+    public ResourceManager getResources() {
+        return resources;
+    }
+
     public AssetManager getAssets() {
         return assets;
     }
 
     public SceneRenderer getSceneRenderer() {
         return sceneRenderer;
+    }
+
+    public void createSceneRenderer() {
+        sceneRenderer = new SceneRenderer();
     }
 
     @SuppressWarnings("unchecked")

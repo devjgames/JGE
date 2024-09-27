@@ -3,6 +3,7 @@ package org.jge;
 import java.io.File;
 import java.util.Vector;
 
+import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 
 import com.jogamp.opengl.GL2;
@@ -14,6 +15,9 @@ public class SceneRenderer {
     private int trianglesRendered = 0;
     private Node axis = new Node();
     private Matrix4f matrix = new Matrix4f();
+    private Matrix4f lightMatrix = new Matrix4f();
+    private Vector<RenderTarget> shadowTargets = new Vector<>();
+    private FrustumIntersection lightFrustum = new FrustumIntersection();
 
     public int getTrianglesRendered() {
         return trianglesRendered;
@@ -32,15 +36,76 @@ public class SceneRenderer {
         scene.root.traverse((n) -> {
             if(n.visible) {
                 if(scene.frustum.testAab(n.bounds.min, n.bounds.max)) {
+                    if(n.isLight) {
+                        lights.add(n);
+                    }
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        lights.sort((a, b) -> {
+            float da = a.absolutePosition.distance(scene.eye);
+            float db = b.absolutePosition.distance(scene.eye);
+
+            return Float.compare(da, db);
+        });
+
+        trianglesRendered = 0;
+
+        for(int i = 0, si = 0; i != Math.min(LightRenderer.MAX_LIGHTS, lights.size()); i++) {
+            Node l = lights.get(i);
+
+            if(l.isSpotLight) {
+                if(si >= shadowTargets.size()) {
+                    System.out.println("allocating shadow render target ...");
+                    shadowTargets.add(Game.getInstance().getAssets().resources.manage(new RenderTarget(1024, 1024, ColorFormat.FLOAT)));
+                }
+
+                RenderTarget renderTarget = shadowTargets.get(si++);
+
+                l.calcLightProjection(lightMatrix);
+                l.calcLightView(matrix);
+
+                lightMatrix.mul(matrix);
+                lightFrustum.set(lightMatrix);
+
+                renderables.clear();
+                scene.root.traverse((n) -> {
+                    if(n.visible) {
+                        if(lightFrustum.testAab(n.bounds.min, n.bounds.max)) {
+                            if(n.renderable != null && n.castsShadow) {
+                                renderables.add(n);
+                            } 
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+        
+
+                renderTarget.begin();
+                GFX.clear(Float.MAX_VALUE, 0, 0, 1);
+                for(Node node : renderables) {
+                    trianglesRendered += node.renderable.renderShadowPass(scene, node, l);
+                }
+                renderTarget.end();
+                l.lightShadowMap = renderTarget;
+            }
+        }
+
+        renderables.clear();
+
+        scene.root.traverse((n) -> {
+            if(n.visible) {
+                if(scene.frustum.testAab(n.bounds.min, n.bounds.max)) {
                     if(n.renderable != null) {
                         renderables.add(n);
                     } else if(n.isLight) {
                         if(scene.isInDesign()) {
                             renderables.add(n);
                         }
-                    }
-                    if(n.isLight) {
-                        lights.add(n);
                     }
                     return true;
                 }
@@ -63,13 +128,6 @@ public class SceneRenderer {
             }
         });
 
-        lights.sort((a, b) -> {
-            float da = a.absolutePosition.distance(scene.eye);
-            float db = b.absolutePosition.distance(scene.eye);
-
-            return Float.compare(da, db);
-        });
-
         GFX.clear(scene.backgroundColor.x, scene.backgroundColor.y, scene.backgroundColor.z, scene.backgroundColor.w);
 
         GL2 gl = Game.getGL();
@@ -82,8 +140,6 @@ public class SceneRenderer {
         BlendState blendState = null;
 
         LineRenderer lineRenderer = Game.getInstance().getRenderer(LineRenderer.class);
-
-        trianglesRendered = 0;
 
         for(Node node : renderables) {
             if(depthState != node.depthState) {
@@ -98,10 +154,10 @@ public class SceneRenderer {
             if(node.renderable != null) {
                 trianglesRendered += node.renderable.render(scene, node, lights);
             } else if(node.isLight) {
-                lineRenderer.begin(scene.projection, scene.view, matrix.identity().translate(node.absolutePosition));
-                lineRenderer.push(-8, 0, 0, 1, 1, 1, 1, 8, 0, 0, 1, 1, 1, 1);
-                lineRenderer.push(0, -8, 0, 1, 1, 1, 1, 0, 8, 0, 1, 1, 1, 1);
-                lineRenderer.push(0, 0, -8, 1, 1, 1, 1, 0, 0, 8, 1, 1, 1, 1);
+                lineRenderer.begin(scene.projection, scene.view, matrix.identity().translate(node.absolutePosition).mul(node.rotation));
+                lineRenderer.push(-8, 0, 0, 1, 0, 0, 1, 8, 0, 0, 1, 0, 0, 1);
+                lineRenderer.push(0, -8, 0, 0, 1, 0, 1, 0, 8, 0, 0, 1, 0, 1);
+                lineRenderer.push(0, 0, -8, 0, 0, 1, 1, 0, 0, 8, 0, 0, 1, 1);
                 lineRenderer.end();
             } else if(node == axis) {
                 float l = scene.calcOffset().length() / 6;

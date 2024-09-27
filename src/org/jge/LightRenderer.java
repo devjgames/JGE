@@ -12,11 +12,12 @@ import com.jogamp.opengl.GL2;
 public class LightRenderer extends Renderer {
     
     public static final int VERTEX_STRIDE = 8;
-    public static final int MAX_LIGHTS = 8;
+    public static final int MAX_LIGHTS = 4;
     
     private final Shader shader;
     private final int vbo;
     private FloatBuffer vBuf = Buffers.newDirectFloatBuffer(6 * VERTEX_STRIDE);
+    private final Matrix4f matrix = new Matrix4f();
 
 
     public LightRenderer() throws Exception {
@@ -32,7 +33,7 @@ public class LightRenderer extends Renderer {
         vbo = b[0];
     }
 
-    public void begin(Matrix4f projection, Matrix4f view, Matrix4f model, Matrix4f modelIT, Vector<Node> lights, Texture texture, Vector4f ambientColor, Vector4f diffuseColor) {
+    public void begin(Matrix4f projection, Matrix4f view, Matrix4f model, Matrix4f modelIT, Vector<Node> lights, Texture texture, Texture decal, boolean receivesShadow, Vector4f ambientColor, Vector4f diffuseColor) {
         GL2 gl = Game.getGL();
 
         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vbo);
@@ -48,16 +49,32 @@ public class LightRenderer extends Renderer {
         if(texture != null) {
             shader.bind(GL2.GL_TEXTURE_2D, "uTexture", 0, texture.id);
         }
+        shader.set("uDecalTextureEnabled", decal != null);
+        if(decal != null) {
+            shader.bind(GL2.GL_TEXTURE_2D, "uDecalTexture", 1, decal.id);
+        }
         shader.set("uAmbientColor", ambientColor);
         shader.set("uDiffuseColor", diffuseColor);
         shader.set("uLightCount", Math.min(lights.size(), MAX_LIGHTS));
+        shader.set("uVertexLightCount", Math.min(lights.size(), MAX_LIGHTS));
         for(int i = 0; i != Math.min(lights.size(), MAX_LIGHTS); i++) {
             Node l = lights.get(i);
 
             shader.set("uLightPosition[" + i + "]", l.absolutePosition);
             shader.set("uLightColor[" + i + "]", l.lightColor);
             shader.set("uLightRadius[" + i + "]", l.lightRadius);
+            shader.set("uLightIsSpot[" + i + "]", l.isSpotLight);
+            if(l.isSpotLight) {
+                shader.set("uLightSpotCutOff[" + i + "]", (float)Math.cos(Math.toRadians(l.lightSpotCutOffDegrees)));
+                shader.set("uLightSpotDirection[" + i + "]", -l.rotation.m10(), -l.rotation.m11(), -l.rotation.m12());
+                shader.set("uLightShadowOffset[" + i + "]", l.lightShadowOffset);
+                shader.bind(GL2.GL_TEXTURE_2D, "uLightShadowMap[" + i + "]", i + 2, l.lightShadowMap.texture.id);
+                shader.set("uLightShadowMapPixelSize[" + i + "]", 1.0f / l.lightShadowMap.texture.w, 1.0f / l.lightShadowMap.texture.h);
+                shader.set("uLightProjection[" + i + "]", l.calcLightProjection(matrix));
+                shader.set("uLightView[" + i + "]", l.calcLightView(matrix));
+            }
         }
+        shader.set("uReceivesShadow", receivesShadow);
         vBuf.limit(vBuf.capacity());
         vBuf.position(0);
     }

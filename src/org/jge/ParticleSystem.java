@@ -169,6 +169,11 @@ public class ParticleSystem implements Renderable {
     }
 
     @Override
+    public int renderShadowPass(Scene scene, Node node, Node light) throws Exception {
+        return 0;
+    }
+
+    @Override
     public int render(Scene scene, Node node, Vector<Node> lights) throws Exception {
         ColorRenderer renderer = Game.getInstance().getRenderer(ColorRenderer.class);
 

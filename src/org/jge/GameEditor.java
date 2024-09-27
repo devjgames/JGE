@@ -145,6 +145,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private Vector3f point = new Vector3f();
     private File loadSceneFile = null;
     private File loadTextureFile = null;
+    private File loadDecalFile = null;
     private File loadMeshFile = null;
     private File playSceneFile = null;
     private boolean paste = false;
@@ -620,6 +621,14 @@ public class GameEditor implements org.jge.Game.GameLoop {
             } finally {
                 loadTextureFile = null;
             }
+        } else if(loadDecalFile != null && selected != null) {
+            try {
+                selected.decal = game.getAssets().load(loadDecalFile);
+            } catch(Exception ex) {
+                ex.printStackTrace(System.out);
+            } finally {
+                loadDecalFile = null;
+            }
         } else if(loadMeshFile != null) {
             Node node = null;
             try {
@@ -901,6 +910,26 @@ public class GameEditor implements org.jge.Game.GameLoop {
                             selected.texture = null;
                         } else {
                             loadTextureFile = file;
+                        }
+                    } catch(Exception ex) {
+                        ex.printStackTrace(System.out);
+                    }
+                }
+            });
+            flowPanel.add(button);
+            editorPanel.add(flowPanel);
+
+            flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+            button = new JButton(new AbstractAction("decal") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    File file = Utils.selectFile(frame, IO.file("assets"), ".png");
+
+                    try {
+                        if(file == null) {
+                            selected.decal = null;
+                        } else {
+                            loadDecalFile = file;
                         }
                     } catch(Exception ex) {
                         ex.printStackTrace(System.out);

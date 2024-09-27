@@ -8,6 +8,7 @@ public class Mesh implements Renderable {
     public static class MeshPart {
 
         public Texture texture = null;
+        public Texture decal = null;
         public final Vector<VertexPTN> vertices = new Vector<>();
         public final Vector<Integer> indices = new Vector<>();
         public final AABB bounds = new AABB();
@@ -73,11 +74,23 @@ public class Mesh implements Renderable {
     }
 
     @Override
+    public int renderShadowPass(Scene scene, Node node, Node light) throws Exception {
+        ShadowRenderer renderer = Game.getInstance().getRenderer(ShadowRenderer.class);
+
+        for(MeshPart part : parts) {
+            renderer.begin(node, light);
+            renderer.push(part.vertices, part.indices, part.indices.size());
+            renderer.end();
+        }
+        return getTriangleCount();
+    }
+
+    @Override
     public int render(Scene scene, Node node, Vector<Node> lights) throws Exception {
         LightRenderer renderer = Game.getInstance().getRenderer(LightRenderer.class);
 
         for(MeshPart part : parts) {
-            renderer.begin(scene.projection, scene.view, node.model, node.modelIT, lights, part.texture, node.ambientColor, node.diffuseColor);
+            renderer.begin(scene.projection, scene.view, node.model, node.modelIT, lights, part.texture, part.decal, node.receivesShadow, node.ambientColor, node.diffuseColor);
             renderer.push(part.vertices, part.indices, part.indices.size());
             renderer.end();
         }

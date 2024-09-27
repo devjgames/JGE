@@ -57,6 +57,8 @@ public class AssetManager extends Resource {
             }
         }
         assets.clear();
+
+        Game.getInstance().createSceneRenderer();
     }
 
     @Override
