@@ -164,7 +164,7 @@ public class Player extends NodeComponent {
             ", TRI = " + Game.getInstance().getSceneRenderer().getTrianglesRendered(), 8, 12, 100, 5, 10, 10, 1, 1, 1, 1);
         renderer.endSprite();
         renderer.beginSprite(icon);
-        renderer.push(0, 0, icon.w, icon.h, 10, Game.getInstance().h() - 10 - icon.h * 2, icon.w * 2, icon.h * 2, 1, 1, 1, 1);
+        renderer.push(0, 0, icon.w, icon.h, 10, Game.getInstance().h() - 10 - icon.h * 2, icon.w * 2, icon.h * 2, 1, 1, 1, 1, false);
         renderer.endSprite();
     }
 

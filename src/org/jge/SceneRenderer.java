@@ -18,6 +18,7 @@ public class SceneRenderer {
     private Matrix4f lightMatrix = new Matrix4f();
     private Vector<RenderTarget> shadowTargets = new Vector<>();
     private FrustumIntersection lightFrustum = new FrustumIntersection();
+    private RenderTarget scaleTarget = null;
 
     public int getTrianglesRendered() {
         return trianglesRendered;
@@ -60,7 +61,7 @@ public class SceneRenderer {
             if(l.isSpotLight) {
                 if(si >= shadowTargets.size()) {
                     System.out.println("allocating shadow render target ...");
-                    shadowTargets.add(Game.getInstance().getAssets().resources.manage(new RenderTarget(1024, 1024, ColorFormat.FLOAT)));
+                    shadowTargets.add(Game.getInstance().getResources().manage(new RenderTarget(1024, 1024, ColorFormat.FLOAT)));
                 }
 
                 RenderTarget renderTarget = shadowTargets.get(si++);
@@ -128,6 +129,23 @@ public class SceneRenderer {
             }
         });
 
+        boolean create = scaleTarget == null;
+
+        if(!create) {
+            create = scaleTarget.texture.w != Game.getInstance().w() || scaleTarget.texture.h != Game.getInstance().h();
+        }
+        if(create) {
+            create = Game.getInstance().w() > 50 && Game.getInstance().h() > 50;
+        }
+        if(create) {
+            if(scaleTarget != null) {
+                Game.getInstance().getResources().unManage(scaleTarget);
+            }
+            scaleTarget = Game.getInstance().getResources().manage(new RenderTarget(Game.getInstance().w() / 2, Game.getInstance().h() / 2, ColorFormat.COLOR));
+        }
+
+        scaleTarget.begin();
+
         GFX.clear(scene.backgroundColor.x, scene.backgroundColor.y, scene.backgroundColor.z, scene.backgroundColor.w);
 
         GL2 gl = Game.getGL();
@@ -170,10 +188,15 @@ public class SceneRenderer {
             }
             trianglesRendered += node.render();
         }
+        scaleTarget.end();
 
         SpriteRenderer spriteRenderer = Game.getInstance().getRenderer(SpriteRenderer.class);
 
+        GFX.clear(0, 0, 0, 1);
         spriteRenderer.begin();
+        spriteRenderer.beginSprite(scaleTarget.texture);
+        spriteRenderer.push(0, 0, scaleTarget.texture.w, scaleTarget.texture.h, 0, 0, Game.getInstance().w(), Game.getInstance().h(), 1, 1, 1, 1, true);
+        spriteRenderer.endSprite();
         scene.root.traverse((n) -> {
             if(n.visible) {
                 n.renderSprites();

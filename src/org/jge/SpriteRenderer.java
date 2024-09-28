@@ -55,7 +55,7 @@ public class SpriteRenderer extends Renderer {
         vBuf.position(0);
     }
 
-    public void push(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, float r, float g, float b, float a) {
+    public void push(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, float r, float g, float b, float a, boolean flip) {
         if(texture == null ){
             return;
         }
@@ -81,6 +81,13 @@ public class SpriteRenderer extends Renderer {
             vBuf.flip();
             nBuf.put(vBuf);
             vBuf = nBuf;
+        }
+
+        if(flip) {
+            float t = sy1;
+
+            sy1 = sy2;
+            sy2 = t;
         }
 
         vBuf.put(dx1);
@@ -154,7 +161,7 @@ public class SpriteRenderer extends Renderer {
                     int col = j % cols;
                     int row = j / cols;
 
-                    push(col * cw, row * ch, cw, ch, x, y, cw, ch, r, g, b, a);
+                    push(col * cw, row * ch, cw, ch, x, y, cw, ch, r, g, b, a, false);
                     x += cw;
                 }
             }
