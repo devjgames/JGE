@@ -6,8 +6,6 @@ import java.util.Vector;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 
-import com.jogamp.opengl.GL2;
-
 public class SceneRenderer {
     
     private Vector<Node> renderables = new Vector<>();
@@ -60,7 +58,7 @@ public class SceneRenderer {
 
             if(l.isSpotLight) {
                 if(si >= shadowTargets.size()) {
-                    System.out.println("allocating shadow render target ...");
+                    System.out.println("allocating scene renderer shadow render target ...");
                     shadowTargets.add(Game.getInstance().getResources().manage(new RenderTarget(1024, 1024, ColorFormat.FLOAT)));
                 }
 
@@ -132,26 +130,23 @@ public class SceneRenderer {
         boolean create = scaleTarget == null;
 
         if(!create) {
-            create = scaleTarget.texture.w != Game.getInstance().w() || scaleTarget.texture.h != Game.getInstance().h();
+            create = scaleTarget.texture.w != Game.getInstance().w() / 2 || scaleTarget.texture.h != Game.getInstance().h() / 2;
         }
         if(create) {
             create = Game.getInstance().w() > 50 && Game.getInstance().h() > 50;
         }
         if(create) {
             if(scaleTarget != null) {
+                System.out.println("releasing scene renderer scale target ...");;
                 Game.getInstance().getResources().unManage(scaleTarget);
             }
+            System.out.println("allocating scene renderer scale target ...");;
             scaleTarget = Game.getInstance().getResources().manage(new RenderTarget(Game.getInstance().w() / 2, Game.getInstance().h() / 2, ColorFormat.COLOR));
         }
 
         scaleTarget.begin();
 
         GFX.clear(scene.backgroundColor.x, scene.backgroundColor.y, scene.backgroundColor.z, scene.backgroundColor.w);
-
-        GL2 gl = Game.getGL();
-        
-        gl.glEnable(GL2.GL_POLYGON_OFFSET_FILL);
-        gl.glPolygonOffset(1, 1);
 
         DepthState depthState = null;
         CullState cullState = null;
