@@ -40,11 +40,7 @@ public abstract class NodeComponent {
 
     public void handleInput() throws Exception {
     }
-
-    public int render() throws Exception {
-        return 0;
-    }
-
+    
     public void renderSprites() throws Exception {
     }
 

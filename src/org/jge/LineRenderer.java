@@ -1,5 +1,7 @@
 package org.jge;
 
+import java.util.Vector;
+
 import org.joml.Matrix4f;
 
 import com.jogamp.opengl.GL2;
@@ -26,6 +28,15 @@ public class LineRenderer extends Renderer {
         vertex.position.set(x2, y2, z2);
         vertex.color.set(r2, g2, b2, a2);
         renderer.push(vertex);
+    }
+
+    public void push(VertexPTC v1, VertexPTC v2) {
+        renderer.push(v1);
+        renderer.push(v2);
+    }
+
+    public void push(Vector<VertexPTC> vertices, Vector<Integer> indices, int indexCount) {
+        renderer.push(vertices, indices, indexCount);
     }
 
     public void end() {

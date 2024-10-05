@@ -181,7 +181,6 @@ public class SceneRenderer {
                 lineRenderer.push(0, 0, 0, 0, 0, 1, 1, 0, 0, l, 0, 0, 1, 1);
                 lineRenderer.end();
             }
-            trianglesRendered += node.render();
         }
         scaleTarget.end();
 

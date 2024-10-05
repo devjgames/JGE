@@ -105,6 +105,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
             String s = new String(b, off, len);
 
             textArea.append(s);
+            textArea.setCaretPosition(textArea.getText().length());
 
             try {
                 IO.appendAllBytes(s.getBytes(), logFile);
@@ -192,13 +193,14 @@ public class GameEditor implements org.jge.Game.GameLoop {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         buttons.put("AddScene", new JButton(
-            new AbstractAction("+") {
+            new AbstractAction("Scene") {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     createScene();
                 };
             }
         ));
+        buttons.get("AddScene").setIcon(addIcon);
         bottomPanel.add(buttons.get("AddScene"));
 
         buttons.put("Load", new JButton(

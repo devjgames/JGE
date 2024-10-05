@@ -280,15 +280,6 @@ public class Node implements Iterable<Node> {
         }
     }
 
-    public int render() throws Exception {
-        int trianglesRendered = 0;
-
-        for(NodeComponent component : components) {
-            trianglesRendered += component.render();
-        }   
-        return trianglesRendered;
-    }
-
     public void renderSprites() throws Exception {
         for(NodeComponent component : components) {
             component.renderSprites();;   
