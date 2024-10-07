@@ -1059,6 +1059,11 @@ public class GameEditor implements org.jge.Game.GameLoop {
             Class<? extends Object> type = field.getType();
             String name = field.getName();
             int m = field.getModifiers();
+            boolean hidden = field.getAnnotationsByType(Hidden.class).length != 0;
+
+            if(hidden) {
+                continue;
+            }
 
             if(
                 ((int.class.isAssignableFrom(type) ||
@@ -1084,7 +1089,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                                 dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
                                 dialog.setResizable(true);
                                 dialog.setModal(true);
-                                dialog.setTitle("name");
+                                dialog.setTitle(fname);
                                 dialog.setLayout(new BorderLayout());
 
                                 JTextArea textArea = new JTextArea();

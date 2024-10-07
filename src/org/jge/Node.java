@@ -14,6 +14,10 @@ public class Node implements Iterable<Node> {
     }
     
     public String name = "Node";
+    @Hidden
+    public String data = "";
+    @MultiLine
+    public String text = "";
     public boolean visible = true;
     public boolean collidable = false;
     public boolean dynamic = false;

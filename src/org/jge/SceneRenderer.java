@@ -168,9 +168,9 @@ public class SceneRenderer {
                 trianglesRendered += node.renderable.render(scene, node, lights);
             } else if(node.isLight) {
                 lineRenderer.begin(scene.projection, scene.view, matrix.identity().translate(node.absolutePosition).mul(node.rotation));
-                lineRenderer.push(-8, 0, 0, 1, 0, 0, 1, 8, 0, 0, 1, 0, 0, 1);
-                lineRenderer.push(0, -8, 0, 0, 1, 0, 1, 0, 8, 0, 0, 1, 0, 1);
-                lineRenderer.push(0, 0, -8, 0, 0, 1, 1, 0, 0, 8, 0, 0, 1, 1);
+                lineRenderer.push(0, 0, 0, 1, 0, 0, 1, 8, 0, 0, 1, 0, 0, 1);
+                lineRenderer.push(0, 0, 0, 0, 1, 0, 1, 0, 8, 0, 0, 1, 0, 1);
+                lineRenderer.push(0, 0, 0, 0, 0, 1, 1, 0, 0, 8, 0, 0, 1, 1);
                 lineRenderer.end();
             } else if(node == axis) {
                 float l = scene.calcOffset().length() / 6;
