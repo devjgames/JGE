@@ -22,6 +22,10 @@ public class SceneRenderer {
         return trianglesRendered;
     }
 
+    void clearShadowTargets() {
+        shadowTargets.clear();
+    }
+
     public void render(Scene scene) throws Exception {
         scene.calcBoundsAndTransform();
         scene.root.initAndStart();
@@ -59,7 +63,7 @@ public class SceneRenderer {
             if(l.isSpotLight) {
                 if(si >= shadowTargets.size()) {
                     System.out.println("allocating scene renderer shadow render target ...");
-                    shadowTargets.add(Game.getInstance().getResources().manage(new RenderTarget(1024, 1024, ColorFormat.FLOAT)));
+                    shadowTargets.add(Game.getInstance().getAssets().resources.manage(new RenderTarget(1024, 1024, ColorFormat.FLOAT)));
                 }
 
                 RenderTarget renderTarget = shadowTargets.get(si++);

@@ -12,7 +12,8 @@ public class App {
             Player.class,
             Rotator.class,
             Sky.class,
-            Torch.class
+            Torch.class,
+            Map.class
         );
     }
 }

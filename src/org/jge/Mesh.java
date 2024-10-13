@@ -13,10 +13,32 @@ public class Mesh implements Renderable {
         public final Vector<Integer> indices = new Vector<>();
         public final AABB bounds = new AABB();
 
+        private final VertexPTN vertex = new VertexPTN();
+
         public void calcBounds() {
             bounds.clear();
             for(VertexPTN v : vertices) {
                 bounds.add(v.position);
+            }
+        }
+
+        public void addVertex(float x, float y, float z, float s, float t, float nx, float ny, float nz) throws Exception {
+            vertex.position.set(x, y, z);
+            vertex.textureCoordinate.set(s, t);
+            vertex.normal.set(nx, ny, nz);
+            if(vertex.normal.length() > 0.0000001) {
+                vertex.normal.normalize();
+            }
+            vertices.add(vertex.newInstance());
+        }
+
+        public void addPolygon(int ... indices) {
+            int tris = indices.length - 2;
+
+            for(int i = 0; i != tris; i++) {
+                this.indices.add(indices[0]);
+                this.indices.add(indices[i + 1]);
+                this.indices.add(indices[i + 2]);
             }
         }
     }

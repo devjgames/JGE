@@ -10,7 +10,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class Serializer {
+public class SceneSerializer {
     
 
     public static Scene deserialize(boolean inDesign, File file) throws Exception {

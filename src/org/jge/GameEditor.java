@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -222,7 +224,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     try {
-                        Serializer.serialize(scene, scene.file);
+                        SceneSerializer.serialize(scene, scene.file);
                     } catch(Exception ex) {
                         ex.printStackTrace(System.out);
                     }
@@ -593,7 +595,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
         if(loadSceneFile != null) {
             try {
                 game.getAssets().clear();
-                scene = Serializer.deserialize(true, loadSceneFile);
+                scene = SceneSerializer.deserialize(true, loadSceneFile);
             } catch(Exception ex) {
                 ex.printStackTrace(System.out);
             } finally {
@@ -606,7 +608,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
             try {
                 scene = null;
                 game.getAssets().clear();
-                scene = Serializer.deserialize(false, playSceneFile);
+                scene = SceneSerializer.deserialize(false, playSceneFile);
             } catch(Exception ex) {
                 ex.printStackTrace(System.out);
             } finally {
@@ -693,7 +695,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                     try {
                         scene = null;
                         game.getAssets().clear();
-                        scene = Serializer.deserialize(false, f);
+                        scene = SceneSerializer.deserialize(false, f);
                     } catch(Exception ex) {
                         ex.printStackTrace(System.out);
                         enableUI();
@@ -1223,47 +1225,88 @@ public class GameEditor implements org.jge.Game.GameLoop {
                 editorPanel.add(flowPanel);
             } else if(type.isEnum() && !Modifier.isStatic(m) && !Modifier.isFinal(m)) {
                 try {
-                    JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-                    JComboBox<Object> combo = new JComboBox<>();
                     Object[] values = type.getEnumConstants();
-                    int w = 1;
                     String item = Utils.toString(o, name);
 
-                    for(Object v : values) {
-                        String s = v.toString();
+                    if(field.getAnnotationsByType(EnumRadioButtons.class).length != 0) {
+                        ButtonGroup group = new ButtonGroup();
+                        JRadioButton selected = null;
+                        JLabel label = new JLabel(name);
+                        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-                        if(s.length() > w) {
-                            w = s.length();
-                            combo.setPrototypeDisplayValue(v);
+                        labelPanel.add(label);
+                        editorPanel.add(labelPanel);
+                        for(Object v : values) {
+                            JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+                            JRadioButton button = new JRadioButton(new AbstractAction(v.toString()) {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    JRadioButton rb = (JRadioButton)e.getSource();
+                                    String fn = (String)rb.getClientProperty(PFX + ".NAME");
+                                    Object fo = rb.getClientProperty(PFX + ".OBJECT");
+                                    ButtonGroup bg = (ButtonGroup)rb.getClientProperty(PFX + ".GROUP");
+            
+                                    if(bg.getSelection() == rb.getModel()) {
+                                        String v = (String)rb.getClientProperty(PFX + ".VALUE");
+                                        try {
+                                            System.out.println(fo + "." + fn + " = " + v);
+                                            Utils.parse(fo, fn, v);
+                                        } catch(Exception ex) {
+                                            ex.printStackTrace(System.out);
+                                        }
+                                    }
+                                }
+                            });
+
+                            button.putClientProperty(PFX + ".NAME", name);
+                            button.putClientProperty(PFX + ".OBJECT", o);
+                            button.putClientProperty(PFX + ".GROUP", group);
+                            button.putClientProperty(PFX + ".VALUE", v.toString());
+                            group.add(button);
+                            if(v.toString().equals(item)) {
+                                selected = button;
+                            }
+
+                            flowPanel.add(button);
+                            editorPanel.add(flowPanel);
                         }
-                        combo.addItem(v);
+                        if(selected != null) {
+                            selected.setSelected(true);
+                        }
+                    } else {
+                        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+                        JComboBox<Object> combo = new JComboBox<>();
+
+                        for(Object v : values) {
+                            combo.addItem(v);
+                        }
+                        combo.putClientProperty(PFX + ".NAME", name);
+                        combo.putClientProperty(PFX + ".OBJECT", o);
+                        for(int i = 0; i != values.length; i++) {
+                            String v = values[i].toString();
+
+                            if(v.equals(item)) {
+                                combo.setSelectedIndex(i);
+                                break;
+                            }
+                        }
+
+                        flowPanel.add(combo);
+                        flowPanel.add(new JLabel(name, JLabel.LEFT));
+                        editorPanel.add(flowPanel);
+
+                        combo.addItemListener((e) -> {
+                            JComboBox<Object> cb = (JComboBox<Object>)e.getSource();
+                            String fname = (String)cb.getClientProperty(PFX + ".NAME");
+                            Object fo = cb.getClientProperty(PFX + ".OBJECT");
+
+                            try {
+                                Utils.parse(fo, fname, cb.getSelectedItem().toString());
+                            } catch(Exception ex) {
+                                ex.printStackTrace(System.out);
+                            }
+                        });
                     }
-                    combo.putClientProperty(PFX + ".NAME", name);
-                    combo.putClientProperty(PFX + ".OBJECT", o);
-                    for(int i = 0; i != values.length; i++) {
-                        String v = values[i].toString();
-
-                        if(v.equals(item)) {
-                            combo.setSelectedIndex(i);
-                            break;
-                        }
-                    }
-
-                    flowPanel.add(combo);
-                    flowPanel.add(new JLabel(name, JLabel.LEFT));
-                    editorPanel.add(flowPanel);
-
-                    combo.addItemListener((e) -> {
-                        JComboBox<Object> cb = (JComboBox<Object>)e.getSource();
-                        String fname = (String)cb.getClientProperty(PFX + ".NAME");
-                        Object fo = cb.getClientProperty(PFX + ".OBJECT");
-
-                        try {
-                            Utils.parse(fo, fname, cb.getSelectedItem().toString());
-                        } catch(Exception ex) {
-                            ex.printStackTrace(System.out);
-                        }
-                    });
                 } catch(Exception ex) {
                     ex.printStackTrace(System.out);
                 }

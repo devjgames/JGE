@@ -14,10 +14,6 @@ public class Node implements Iterable<Node> {
     }
     
     public String name = "Node";
-    @Hidden
-    public String data = "";
-    @MultiLine
-    public String text = "";
     public boolean visible = true;
     public boolean collidable = false;
     public boolean dynamic = false;
@@ -168,7 +164,7 @@ public class Node implements Iterable<Node> {
     }
 
     public Matrix4f calcLightProjection(Matrix4f matrix) {
-        return matrix.identity().perspective((float)Math.toRadians(90), 1, 1, lightRadius);
+        return matrix.identity().perspective((float)Math.toRadians(lightSpotCutOffDegrees * 2), 1, 1, lightRadius);
     }
 
     public Matrix4f calcLightView(Matrix4f matrix) {
