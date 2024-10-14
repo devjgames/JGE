@@ -13,7 +13,8 @@ public class App {
             Rotator.class,
             Sky.class,
             Torch.class,
-            Map.class
+            Map.class,
+            NPC.class
         );
     }
 }

@@ -1249,7 +1249,6 @@ public class GameEditor implements org.jge.Game.GameLoop {
                                     if(bg.getSelection() == rb.getModel()) {
                                         String v = (String)rb.getClientProperty(PFX + ".VALUE");
                                         try {
-                                            System.out.println(fo + "." + fn + " = " + v);
                                             Utils.parse(fo, fn, v);
                                         } catch(Exception ex) {
                                             ex.printStackTrace(System.out);
