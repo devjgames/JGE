@@ -1,6 +1,5 @@
 package org.jge.demo;
 
-import org.jge.AABB;
 import org.jge.Collider;
 import org.jge.Game;
 import org.jge.IO;
@@ -11,10 +10,11 @@ import org.jge.Resource;
 import org.jge.Sound;
 import org.jge.SpriteRenderer;
 import org.jge.Texture;
+import org.jge.Triangle;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import java.util.Vector;
+import java.awt.event.KeyEvent;
 
 
 public class Player extends NodeComponent {
@@ -22,26 +22,18 @@ public class Player extends NodeComponent {
     public float length = 200;
 
     private final Vector3f f = new Vector3f();
+    private final Vector3f o = new Vector3f();
+    private final Vector3f d = new Vector3f();
+    private final Triangle hTriangle = new Triangle();
     private final Collider collider = new Collider();
-    private final Vector<Region> regions = new Vector<>();
-    private final AABB bounds = new AABB();
+    private final float[] time = new float[1];
+    private boolean down = false;
 
     @Override
     public void init() throws Exception {
         if(scene().isInDesign()) {
             return;
         }
-
-        scene().root.traverse((n) -> {
-            for(int i = 0; i != n.getComponentCount(); i++) {
-                NodeComponent component = n.getComponent(i);
-
-                if(component instanceof Region) {
-                    regions.add((Region)component);
-                }
-            }
-            return true;
-        });
 
         Vector3f o = scene().calcOffset();
 
@@ -83,6 +75,21 @@ public class Player extends NodeComponent {
     public void update() throws Exception {
         if(scene().isInDesign()) {
             return;
+        }
+
+        if(Game.getInstance().keyDown(KeyEvent.VK_S)) {
+            if(!down) {
+                d.set(-node().rotation.m00(), 0.2f, -node().rotation.m02()).normalize().normalize(length);
+                scene().target.add(d, scene().eye);
+                scene().up.set(0, 1, 0);
+                down = true;
+            }
+        } else {
+            down = false;
+        }
+
+        if(Game.getInstance().buttonDown(2)) {
+            scene().rotate(Game.getInstance().dX() * 0.025f, Game.getInstance().dY() * 0.025f);
         }
 
         boolean moving = false;
@@ -129,19 +136,17 @@ public class Player extends NodeComponent {
         collider.velocity.y -= collider.gravity * Game.getInstance().elapsedTime();
         collider.resolve(scene(), scene().root, node().position);
 
-        Vector3f o = scene().calcOffset();
-
-        for(Region region : regions) {
-            bounds.min.set(region.node().position.x - region.size.x / 2, -10000, region.node().position.z - region.size.y / 2);
-            bounds.max.set(region.node().position.x + region.size.x / 2, +10000, region.node().position.z + region.size.y / 2);
-            if(bounds.contains(node().position)) {
-                o.lerp(region.offset, region.speed * Game.getInstance().elapsedTime(), o);
-            }
+        o.set(node().position);
+        d.set(scene().calcOffset()).normalize();
+        time[0] = length + 8;
+        if(collider.intersect(scene(), scene().root, o, d, 1, 0xF, time, false, hTriangle)) {
+            d.mul(time[0] - 8);
+        } else {
+            d.mul(length);
         }
 
-        scene().target.set(node().position);
-        scene().target.add(o, scene().eye);
-        scene().up.set(0, 1, 0);
+        scene().target.set(o);
+        scene().target.add(d, scene().eye);
     }
 
     @Override

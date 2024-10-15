@@ -13,8 +13,7 @@ public class App {
             Rotator.class,
             Torch.class,
             Map.class,
-            NPC.class,
-            Region.class
+            NPC.class
         );
     }
 }

@@ -47,7 +47,7 @@ public class Collider {
         return tested;
     }
 
-    public boolean intersect(Scene scene, Node root, Vector3f origin, Vector3f direction, float buffer, int mask, float[] time, Triangle hit) throws Exception {
+    public boolean intersect(Scene scene, Node root, Vector3f origin, Vector3f direction, float buffer, int mask, float[] time, boolean ignoreBackfaces, Triangle hit) throws Exception {
         hNode = null;
         root.traverse((n) -> {
             bounds.clear();
@@ -63,9 +63,16 @@ public class Collider {
                                 for(int i = 0; i != t.getTriangleCount(); i++) {
                                     t.getTriangle(i, triangle);
                                     if((triangle.tag & mask) != 0) {
-                                        if(triangle.intersects(origin, direction, buffer, time)) {;
-                                            hit.set(triangle);
-                                            hNode = n;
+                                        boolean skip = ignoreBackfaces;
+                                        
+                                        if(skip) {
+                                            skip = triangle.n.dot(direction) > 0;
+                                        }
+                                        if(!skip) {
+                                            if(triangle.intersects(origin, direction, buffer, time)) {;
+                                                hit.set(triangle);
+                                                hNode = n;
+                                            }
                                         }
                                     }
                                 }
@@ -77,9 +84,16 @@ public class Collider {
                         for(int i = 0; i != n.getTriangleCount(); i++) {
                             n.getTriangle(scene, i, triangle);
                             if((triangle.tag & mask) != 0) {
-                                if(triangle.intersects(origin, direction, buffer, time)) {
-                                    hit.set(triangle);
-                                    hNode = n;
+                                boolean skip = ignoreBackfaces;
+                                        
+                                if(skip) {
+                                    skip = triangle.n.dot(direction) > 0;
+                                }
+                                if(!skip) {
+                                    if(triangle.intersects(origin, direction, buffer, time)) {
+                                        hit.set(triangle);
+                                        hNode = n;
+                                    }
                                 }
                             }
                         }
