@@ -59,7 +59,7 @@ public class PathNode implements Renderable {
         renderer.push(position.x, position.y, position.z, 1, 0, 0, 1, position.x, position.y + 8, position.z, 1, 0, 0, 1);
         renderer.push(position.x, position.y, position.z, 1, 0, 0, 1, position.x, position.y, position.z + 8, 1, 0, 0, 1);
         for(PathNode child : children) {
-            renderer.push(position.x, position.y, position.z, 1, 1, 1, 1, child.position.x, child.position.y, child.position.z, 1, 1, 1, 1);
+            renderer.push(position.x, position.y, position.z, 1, 0.5f, 0, 1, child.position.x, child.position.y, child.position.z, 1, 0.5f, 0, 1);
             child.render(renderer);
         }
     }

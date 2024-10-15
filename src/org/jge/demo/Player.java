@@ -1,5 +1,6 @@
 package org.jge.demo;
 
+import org.jge.AABB;
 import org.jge.Collider;
 import org.jge.Game;
 import org.jge.IO;
@@ -10,23 +11,20 @@ import org.jge.Resource;
 import org.jge.Sound;
 import org.jge.SpriteRenderer;
 import org.jge.Texture;
-import org.jge.Triangle;
-
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+
+import java.util.Vector;
 
 
 public class Player extends NodeComponent {
     
-    public float length = 100;
-    public float height = 25;
+    public float length = 200;
 
     private final Vector3f f = new Vector3f();
-    private final Vector3f o = new Vector3f();
-    private final Vector3f d = new Vector3f();
-    private final float[] time = new float[1];
     private final Collider collider = new Collider();
-    private final Triangle hTriangle = new Triangle();
+    private final Vector<Region> regions = new Vector<>();
+    private final AABB bounds = new AABB();
 
     @Override
     public void init() throws Exception {
@@ -34,15 +32,23 @@ public class Player extends NodeComponent {
             return;
         }
 
+        scene().root.traverse((n) -> {
+            for(int i = 0; i != n.getComponentCount(); i++) {
+                NodeComponent component = n.getComponent(i);
+
+                if(component instanceof Region) {
+                    regions.add((Region)component);
+                }
+            }
+            return true;
+        });
+
         Vector3f o = scene().calcOffset();
 
-        float dx = o.x;
-        float dz = o.z;
-        float dl = Vector2f.length(dx, dz);
-        float dy = height;
+        o.normalize(length);
 
         scene().target.set(node().position);
-        scene().target.add(dx / dl * length, dy, dz / dl * length, scene().eye);
+        scene().target.add(o, scene().eye);
 
         if(node().getChildCount() != 0) {
             Node child = node().getChild(0);
@@ -78,13 +84,8 @@ public class Player extends NodeComponent {
         if(scene().isInDesign()) {
             return;
         }
-        if(Game.getInstance().buttonDown(2)) {
-            scene().rotate(Game.getInstance().dX() * 0.02f, 0);
-        }
 
         boolean moving = false;
-        float dx = scene().eye.x - scene().target.x;
-        float dz = scene().eye.z - scene().target.z;
         float x = Game.getInstance().w() / 2 - Game.getInstance().mouseX();
         float y = Game.getInstance().mouseY() - Game.getInstance().h() / 2;
         float l = Vector2f.length(x, y);
@@ -128,27 +129,18 @@ public class Player extends NodeComponent {
         collider.velocity.y -= collider.gravity * Game.getInstance().elapsedTime();
         collider.resolve(scene(), scene().root, node().position);
 
-        l = length;
-        o.set(node().position);
-        d.set(dx, 0, dz);
-        d.normalize();
-        time[0] = l + (collider.radius - 1);
-        if(collider.intersect(scene(), scene().root, o, d, 1, 0xFF, time, hTriangle)) {
-            l = Math.min(time[0], length) - (collider.radius - 1);
-        }
-        d.mul(1, 0, 1).normalize(l);
-        d.y = height + (length - l);
+        Vector3f o = scene().calcOffset();
 
-        l = d.length();
-        d.normalize();
-        time[0] = l + (collider.radius - 1);
-        if(collider.intersect(scene(), scene().root, o, d, 1, 0xFF, time, hTriangle)) {
-            l = Math.min(time[0], l) - (collider.radius - 1);
+        for(Region region : regions) {
+            bounds.min.set(region.node().position.x - region.size.x / 2, -10000, region.node().position.z - region.size.y / 2);
+            bounds.max.set(region.node().position.x + region.size.x / 2, +10000, region.node().position.z + region.size.y / 2);
+            if(bounds.contains(node().position)) {
+                o.lerp(region.offset, region.speed * Game.getInstance().elapsedTime(), o);
+            }
         }
-        d.mul(l);
 
         scene().target.set(node().position);
-        scene().target.add(d, scene().eye);
+        scene().target.add(o, scene().eye);
         scene().up.set(0, 1, 0);
     }
 
@@ -161,7 +153,7 @@ public class Player extends NodeComponent {
         renderer.beginSprite(font);
         renderer.push(
             "FPS = " + Game.getInstance().frameRate() + ", RES = " + Resource.getInstances() + ", TST = " + collider.getTested() + 
-            ", TRI = " + Game.getInstance().getSceneRenderer().getTrianglesRendered(), 8, 12, 100, 5, 10, 10, 1, 1, 1, 1);
+            ", TRI = " + Game.getInstance().getSceneRenderer().getTrianglesRendered() + ", S KEY = LOOK DIRECTION", 8, 12, 100, 5, 10, 10, 1, 1, 1, 1);
         renderer.endSprite();
         renderer.beginSprite(icon);
         renderer.push(0, 0, icon.w, icon.h, 10, Game.getInstance().h() - 10 - icon.h * 2, icon.w * 2, icon.h * 2, 1, 1, 1, 1, false);

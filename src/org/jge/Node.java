@@ -22,6 +22,7 @@ public class Node implements Iterable<Node> {
     public boolean receivesShadow = true;
     public boolean castsShadow = true;
     public final Vector3f position = new Vector3f();
+    @Hidden
     public final Vector3f absolutePosition = new Vector3f();
     public final Matrix4f rotation = new Matrix4f();
     public final Vector3f scale = new Vector3f(1, 1, 1);

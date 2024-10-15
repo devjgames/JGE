@@ -18,6 +18,7 @@ public class SceneRenderer {
     private FrustumIntersection lightFrustum = new FrustumIntersection();
     private RenderTarget scaleTarget = null;
 
+
     public int getTrianglesRendered() {
         return trianglesRendered;
     }
@@ -141,10 +142,10 @@ public class SceneRenderer {
         }
         if(create) {
             if(scaleTarget != null) {
-                System.out.println("releasing scene renderer scale target ...");;
+                System.out.println("releasing scene renderer scale target ...");
                 Game.getInstance().getResources().unManage(scaleTarget);
             }
-            System.out.println("allocating scene renderer scale target ...");;
+            System.out.println("allocating scene renderer scale target ...");
             scaleTarget = Game.getInstance().getResources().manage(new RenderTarget(Game.getInstance().w() / 2, Game.getInstance().h() / 2, ColorFormat.COLOR));
         }
 
@@ -186,7 +187,7 @@ public class SceneRenderer {
                 lineRenderer.end();
             }
         }
-        scaleTarget.end();
+        scaleTarget.end();;
 
         SpriteRenderer spriteRenderer = Game.getInstance().getRenderer(SpriteRenderer.class);
 

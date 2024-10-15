@@ -11,10 +11,10 @@ public class App {
         new GameEditor(800, 500, true, true,
             Player.class,
             Rotator.class,
-            Sky.class,
             Torch.class,
             Map.class,
-            NPC.class
+            NPC.class,
+            Region.class
         );
     }
 }
