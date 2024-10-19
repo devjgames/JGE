@@ -16,8 +16,6 @@ public class SceneRenderer {
     private Matrix4f lightMatrix = new Matrix4f();
     private Vector<RenderTarget> shadowTargets = new Vector<>();
     private FrustumIntersection lightFrustum = new FrustumIntersection();
-    private RenderTarget scaleTarget = null;
-
 
     public int getTrianglesRendered() {
         return trianglesRendered;
@@ -132,25 +130,6 @@ public class SceneRenderer {
             }
         });
 
-        boolean create = scaleTarget == null;
-
-        if(!create) {
-            create = scaleTarget.texture.w != Game.getInstance().w() / 2 || scaleTarget.texture.h != Game.getInstance().h() / 2;
-        }
-        if(create) {
-            create = Game.getInstance().w() > 50 && Game.getInstance().h() > 50;
-        }
-        if(create) {
-            if(scaleTarget != null) {
-                System.out.println("releasing scene renderer scale target ...");
-                Game.getInstance().getResources().unManage(scaleTarget);
-            }
-            System.out.println("allocating scene renderer scale target ...");
-            scaleTarget = Game.getInstance().getResources().manage(new RenderTarget(Game.getInstance().w() / 2, Game.getInstance().h() / 2, ColorFormat.COLOR));
-        }
-
-        scaleTarget.begin();
-
         GFX.clear(scene.backgroundColor.x, scene.backgroundColor.y, scene.backgroundColor.z, scene.backgroundColor.w);
 
         DepthState depthState = null;
@@ -187,15 +166,10 @@ public class SceneRenderer {
                 lineRenderer.end();
             }
         }
-        scaleTarget.end();;
 
         SpriteRenderer spriteRenderer = Game.getInstance().getRenderer(SpriteRenderer.class);
 
-        GFX.clear(0, 0, 0, 1);
         spriteRenderer.begin();
-        spriteRenderer.beginSprite(scaleTarget.texture);
-        spriteRenderer.push(0, 0, scaleTarget.texture.w, scaleTarget.texture.h, 0, 0, Game.getInstance().w(), Game.getInstance().h(), 1, 1, 1, 1, true);
-        spriteRenderer.endSprite();
         scene.root.traverse((n) -> {
             if(n.visible) {
                 n.renderSprites();

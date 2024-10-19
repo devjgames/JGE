@@ -35,6 +35,7 @@ public class Shader extends Resource {
         if(i[0] == 0) {
             gl.glGetShaderiv(vs, GL2.GL_INFO_LOG_LENGTH, i, 0);
             byte[] bytes = new byte[i[0]];
+            System.out.println(new String(vertexBytes));
             gl.glGetShaderInfoLog(vs, i[0], null, 0, bytes, 0);
             System.out.println(new String(bytes, 0, bytes.length - 1));
             gl.glDeleteShader(vs);
@@ -45,6 +46,7 @@ public class Shader extends Resource {
         if(i[0] == 0) {
             gl.glGetShaderiv(fs, GL2.GL_INFO_LOG_LENGTH, i, 0);
             byte[] bytes = new byte[i[0]];
+            System.out.println(new String(fragmentBytes));
             gl.glGetShaderInfoLog(fs, i[0], null, 0, bytes, 0);
             System.out.println(new String(bytes, 0, bytes.length - 1));
             gl.glDeleteShader(vs);

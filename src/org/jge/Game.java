@@ -2,6 +2,7 @@ package org.jge;
 
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
+
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
@@ -10,6 +11,7 @@ import com.jogamp.opengl.GLProfile;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
@@ -254,7 +256,14 @@ public class Game {
 
         System.out.println("creating renderer - " + cls.getName() + " ...");
 
-        Renderer renderer = resources.manage((T)cls.getConstructors()[0].newInstance());
+        Renderer renderer = null;
+
+        try {
+            renderer = resources.manage((T)cls.getConstructors()[0].newInstance());
+        } catch(InvocationTargetException ex) {
+            ex.getTargetException().printStackTrace(System.out);
+            throw ex;
+        }
 
         renderers.add(renderer);
 

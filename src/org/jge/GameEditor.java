@@ -37,6 +37,8 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import com.jogamp.opengl.GL2;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -91,7 +93,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
         }
     }
 
-    private static class TextAreaStream extends OutputStream {
+    public static class TextAreaStream extends OutputStream {
 
         private JTextArea textArea;
 
@@ -154,6 +156,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private boolean paste = false;
     private Icon deleteIcon;
     private Icon addIcon;
+    private boolean toggleSync;
 
     public GameEditor(int w, int h, boolean resizable, boolean fixedFrameRate, Class<?> ... componentFactories) throws Exception {
 
@@ -352,6 +355,17 @@ public class GameEditor implements org.jge.Game.GameLoop {
             }
         ));
         bottomPanel.add(toggleButtons.get("Pause"));
+
+        JToggleButton fixedFrameButton = new JToggleButton(
+            new AbstractAction("Fixed Frame") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    toggleSync = true;
+                };
+            }
+        );
+        bottomPanel.add(fixedFrameButton);
+        fixedFrameButton.setSelected(fixedFrameRate);
 
         consoleTextArea = new JTextArea();
         consoleTextArea.setEditable(false);
@@ -656,7 +670,19 @@ public class GameEditor implements org.jge.Game.GameLoop {
             populateTree();
             select(node);
             enableUI();
-        } 
+        } else if(toggleSync) {
+            try {
+                GL2 gl = Game.getGL();
+                
+                if(gl.getSwapInterval() == 0) {
+                    gl.setSwapInterval(1);
+                } else {
+                    gl.setSwapInterval(0);
+                }
+            } finally {
+                toggleSync = false;
+            }
+        }
         
         if(scene == null) {
             GFX.clear(0.2f, 0.2f, 0.2f, 1);
@@ -985,7 +1011,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
             }
         }
 
-        addFields(o);
+        addFields(o, editorPanel, tree, model);
 
         if(o == selected) {
             for(int i = 0; i != selected.getComponentCount(); i++) {
@@ -1013,7 +1039,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                 button.putClientProperty(PFX + ".COMPONENT", component);
                 flowPanel2.add(label);
                 editorPanel.add(flowPanel2);
-                addFields(component);
+                addFields(component, editorPanel, tree, model);
                 flowPanel.add(button);
                 editorPanel.add(flowPanel);
             }
@@ -1052,8 +1078,12 @@ public class GameEditor implements org.jge.Game.GameLoop {
         editorContainerPanel.getParent().validate();
     }
 
+    public static void addFields(Object o, JPanel editorPanel) {
+        addFields(o, editorPanel, null, null);
+    }
+
     @SuppressWarnings("unchecked")
-    private void addFields(Object o) {
+    private static void addFields(Object o, JPanel editorPanel, JTree tree, DefaultTreeModel model) {
         Class<? extends Object> cls = o.getClass();
         Field[] fields = cls.getFields();
 
