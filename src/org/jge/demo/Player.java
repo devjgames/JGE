@@ -54,7 +54,7 @@ public class Player extends NodeComponent {
                 child.rotation
                 .identity()
                 .rotate((float)Math.toRadians(-90), 1, 0, 0)
-                .translate(0, 0, -mesh.getBounds().min.z - collider.radius + 1);
+                .translate(0, 0, -mesh.getBounds().min.z - collider.radius);
             }
         }
 
