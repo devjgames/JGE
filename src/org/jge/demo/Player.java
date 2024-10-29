@@ -158,7 +158,7 @@ public class Player extends NodeComponent {
         renderer.beginSprite(font);
         renderer.push(
             "FPS = " + Game.getInstance().frameRate() + ", RES = " + Resource.getInstances() + ", TST = " + collider.getTested() + 
-            ", TRI = " + Game.getInstance().getSceneRenderer().getTrianglesRendered() + ", S KEY = LOOK DIRECTION", 8, 12, 100, 5, 10, 10, 1, 1, 1, 1);
+            ", TRI = " + Game.getInstance().getSceneRenderer().getTrianglesRendered() + ", S KEY = look direction", 8, 12, 100, 5, 10, 10, 1, 1, 1, 1);
         renderer.endSprite();
         renderer.beginSprite(icon);
         renderer.push(0, 0, icon.w, icon.h, 10, Game.getInstance().h() - 10 - icon.h * 2, icon.w * 2, icon.h * 2, 1, 1, 1, 1, false);
