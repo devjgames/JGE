@@ -20,6 +20,8 @@ import java.awt.event.KeyEvent;
 public class Player extends NodeComponent {
     
     public float length = 200;
+    public float speed = 100;
+    public float gravity = 2000;
 
     private final Vector3f f = new Vector3f();
     private final Vector3f o = new Vector3f();
@@ -110,7 +112,7 @@ public class Player extends NodeComponent {
         scene().target.sub(scene().eye, f);
         f.y = 0;  
         if(f.length() > 0.0000001 && l > 0.001 && Game.getInstance().buttonDown(0)) {
-            scene().move(collider.velocity, -x / l * collider.speed, -y / l * collider.speed);
+            scene().move(collider.velocity, -x / l * speed, -y / l * speed);
             x = collider.velocity.x;
             y = collider.velocity.z;
             l = Vector2f.length(x, y);
@@ -133,7 +135,7 @@ public class Player extends NodeComponent {
                 mesh.setSequence(0, 39, 10, true);
             }
         }
-        collider.velocity.y -= collider.gravity * Game.getInstance().elapsedTime();
+        collider.velocity.y -= gravity * Game.getInstance().elapsedTime();
         collider.resolve(scene(), scene().root, node().position);
 
         o.set(node().position);

@@ -12,8 +12,6 @@ public class Collider {
         
     }
     
-    public int speed = 100;
-    public int gravity = 2000;
     public float radius = 16;
     public int groundSlope = 60;
     public final Vector3f velocity = new Vector3f();

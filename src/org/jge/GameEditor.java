@@ -5,37 +5,28 @@ import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import com.jogamp.opengl.GL2;
 
@@ -54,15 +45,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 public class GameEditor implements org.jge.Game.GameLoop {
-
-    private static final File logFile = IO.file("log.txt");
-    private static boolean paused = false;
 
     private static final int ROT = 0;
     private static final int ZOOM = 1;
@@ -77,8 +62,6 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private static final int SCALE = 10;
     private static final int COMPONENT = 11;
 
-    private static final String PFX = "org.j3d.GameEditor.KEY.PFX";
-
     private static class NodeComponentFactory {
 
         public final Class<?> cls;
@@ -90,36 +73,6 @@ public class GameEditor implements org.jge.Game.GameLoop {
         @Override
         public String toString() {
             return cls.getSimpleName();
-        }
-    }
-
-    public static class TextAreaStream extends OutputStream {
-
-        private JTextArea textArea;
-
-        public TextAreaStream(JTextArea textArea) {
-            this.textArea = textArea;
-        }
-
-        @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            if(paused) {
-                return;
-            }
-            String s = new String(b, off, len);
-
-            textArea.append(s);
-            textArea.setCaretPosition(textArea.getText().length());
-
-            try {
-                IO.appendAllBytes(s.getBytes(), logFile);
-            } catch(Exception ex) {
-            }
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            write(new byte[] { (byte)b }, 0, 1);
         }
     }
 
@@ -140,8 +93,6 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private JTree tree;
     private DefaultTreeModel model;
     private JPopupMenu menu;
-    private JPanel editorPanel;
-    private JPanel editorContainerPanel;
     private Vector3f origin = new Vector3f();
     private Vector3f direction = new Vector3f();
     private float[] time = new float[1];
@@ -157,6 +108,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private Icon deleteIcon;
     private Icon addIcon;
     private boolean toggleSync;
+    private EditorPane editorPane;
 
     public GameEditor(int w, int h, boolean resizable, boolean fixedFrameRate, Class<?> ... componentFactories) throws Exception {
 
@@ -165,11 +117,6 @@ public class GameEditor implements org.jge.Game.GameLoop {
             addIcon = new ImageIcon(load("/org/jge/resources/add.png"));
         } catch(Exception ex) {
         }
-
-        if(logFile.exists()) {
-            logFile.delete();
-        }
-        paused = false;
 
         frame = new JFrame("JGE-Editor");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -349,8 +296,8 @@ public class GameEditor implements org.jge.Game.GameLoop {
             new AbstractAction("Pause") {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    paused = !paused;
-                    toggleButtons.get("Pause").setSelected(paused);
+                    TextAreaStream.consolePaused = !TextAreaStream.consolePaused;
+                    toggleButtons.get("Pause").setSelected(TextAreaStream.consolePaused);
                 };
             }
         ));
@@ -549,21 +496,14 @@ public class GameEditor implements org.jge.Game.GameLoop {
             }
         });
 
-        BoxLayout box;
-
-        editorContainerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        editorPanel = new JPanel();
-        box = new BoxLayout(editorPanel, BoxLayout.Y_AXIS);
-        editorPanel.setLayout(box);
-        editorContainerPanel.add(editorPanel);
 
         JScrollPane treePane = new JScrollPane(tree);
-        JScrollPane editorPane = new JScrollPane(editorContainerPanel);
         JScrollPane consolePane = new JScrollPane(consoleTextArea);
         JPanel consolePanel = new JPanel(new BorderLayout());
+        
+        editorPane = new EditorPane(300);
 
-        treePane.setPreferredSize(new Dimension(200, 100));
-        editorPane.setPreferredSize(new Dimension(300, 100));
+        treePane.setPreferredSize(new Dimension(200, 100));;
         consolePane.setPreferredSize(new Dimension(100, 150));
 
         game = new Game(w, h, fixedFrameRate, this);
@@ -573,7 +513,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
         frame.add(bottomPanel, BorderLayout.SOUTH);
 
         frame.add(treePane, BorderLayout.WEST);
-        frame.add(editorPane, BorderLayout.EAST);
+        frame.add(editorPane.getScrollPane(), BorderLayout.EAST);
 
         consolePanel.add(consolePane, BorderLayout.CENTER);
         consolePanel.add(bottomPanel, BorderLayout.NORTH);
@@ -919,12 +859,16 @@ public class GameEditor implements org.jge.Game.GameLoop {
 
     @SuppressWarnings("unchecked")
     private void edit(Object o) {
-        editorPanel.removeAll();
+
+        editorPane.begin();
 
         if(o == null) {
-            editorContainerPanel.getParent().validate();
+            editorPane.end();
             return;
         }
+
+        JPanel editorPanel = editorPane.getEditorPanel();
+
         if(o != selected) {
             selected = null;
             tree.clearSelection();
@@ -1011,7 +955,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
             }
         }
 
-        addFields(o, editorPanel, tree, model);
+        editorPane.addFields(o, tree, model, Node.class);
 
         if(o == selected) {
             for(int i = 0; i != selected.getComponentCount(); i++) {
@@ -1021,7 +965,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         JButton b = (JButton)e.getSource();
-                        NodeComponent c = (NodeComponent)b.getClientProperty(PFX + ".COMPONENT");
+                        NodeComponent c = (NodeComponent)b.getClientProperty(EditorPane.PFX + ".COMPONENT");
 
                         c.remove();
 
@@ -1036,10 +980,10 @@ public class GameEditor implements org.jge.Game.GameLoop {
 
                 label.setFont(new Font(label.getFont().getFontName(), Font.BOLD, 14));
                 label.setForeground(Color.WHITE);
-                button.putClientProperty(PFX + ".COMPONENT", component);
+                button.putClientProperty(EditorPane.PFX + ".COMPONENT", component);
                 flowPanel2.add(label);
                 editorPanel.add(flowPanel2);
-                addFields(component, editorPanel, tree, model);
+                editorPane.addFields(component, tree, model, Node.class);
                 flowPanel.add(button);
                 editorPanel.add(flowPanel);
             }
@@ -1049,7 +993,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JButton b = (JButton)e.getSource();
-                    JComboBox<String> combo = (JComboBox<String>)b.getClientProperty(PFX + ".COMBO");
+                    JComboBox<String> combo = (JComboBox<String>)b.getClientProperty(EditorPane.PFX + ".COMBO");
                     
                     try {
                         NodeComponent component = (NodeComponent)((NodeComponentFactory)combo.getSelectedItem()).cls.getConstructors()[0].newInstance();
@@ -1073,275 +1017,12 @@ public class GameEditor implements org.jge.Game.GameLoop {
             flowPanel.add(button);
             editorPanel.add(flowPanel, o);
 
-            button.putClientProperty(PFX + ".COMBO", combo);
+            button.putClientProperty(EditorPane.PFX + ".COMBO", combo);
         }
-        editorContainerPanel.getParent().validate();
+        editorPane.end();
     }
 
-    public static void addFields(Object o, JPanel editorPanel) {
-        addFields(o, editorPanel, null, null);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void addFields(Object o, JPanel editorPanel, JTree tree, DefaultTreeModel model) {
-        Class<? extends Object> cls = o.getClass();
-        Field[] fields = cls.getFields();
-
-        for(Field field : fields) {
-            Class<? extends Object> type = field.getType();
-            String name = field.getName();
-            int m = field.getModifiers();
-            boolean hidden = field.getAnnotationsByType(Hidden.class).length != 0;
-
-            if(hidden) {
-                continue;
-            }
-
-            if(
-                ((int.class.isAssignableFrom(type) ||
-                float.class.isAssignableFrom(type) ||
-                String.class.isAssignableFrom(type)) && !Modifier.isStatic(m) && !Modifier.isFinal(m)) ||
-                ((Vector2f.class.isAssignableFrom(type) ||
-                Vector3f.class.isAssignableFrom(type) ||
-                Vector4f.class.isAssignableFrom(type)) && !Modifier.isStatic(m))
-            ) {
-                try {
-                    JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-                    boolean multiLine = field.getAnnotationsByType(MultiLine.class).length != 0;
-
-                    if(String.class.isAssignableFrom(type) && multiLine) {
-                        JButton editTextButton = new JButton(new AbstractAction(name + " ...") {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                JDialog dialog = new JDialog();
-                                JButton button = (JButton)e.getSource();
-                                String fname = (String)button.getClientProperty(PFX + ".NAME");
-                                Object fo = button.getClientProperty(PFX + ".OBJECT");
-
-                                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-                                dialog.setResizable(true);
-                                dialog.setModal(true);
-                                dialog.setTitle(fname);
-                                dialog.setLayout(new BorderLayout());
-
-                                JTextArea textArea = new JTextArea();
-                                JScrollPane scrollPane = new JScrollPane(textArea);
-
-                                textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-                                try {
-                                    textArea.setText((String)fo.getClass().getField(fname).get(fo));
-                                } catch(Exception ex) {
-                                    ex.printStackTrace(System.out);
-                                }
-                                scrollPane.setPreferredSize(new Dimension(400, 400));
-
-                                dialog.add(scrollPane, BorderLayout.CENTER);
-
-                                JButton saveButton = new JButton(new AbstractAction("Save") {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        JButton button = (JButton)e.getSource();
-                                        String fname = (String)button.getClientProperty(PFX + ".NAME");
-                                        Object fo = button.getClientProperty(PFX + ".OBJECT");
-                                        JTextArea textArea = (JTextArea)button.getClientProperty(PFX + ".TEXT");
-
-                                        try {
-                                            fo.getClass().getField(fname).set(fo, textArea.getText());
-                                        } catch(Exception ex) {
-                                            ex.printStackTrace(System.out);
-                                        }
-                                    }
-                                });
-
-                                saveButton.putClientProperty(PFX + ".NAME", fname);
-                                saveButton.putClientProperty(PFX + ".OBJECT", fo);
-                                saveButton.putClientProperty(PFX + ".TEXT", textArea);
-
-                                JPanel flow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                                
-                                flow.add(saveButton);
-                                dialog.add(flow, BorderLayout.SOUTH);
-
-                                dialog.pack();
-                                dialog.setVisible(true);
-                            }
-                        });
-                        editTextButton.putClientProperty(PFX + ".NAME", name);
-                        editTextButton.putClientProperty(PFX + ".OBJECT", o);
-                        flowPanel.add(editTextButton);
-                    } else {
-                        JTextField textField = new JTextField(Utils.toString(o, name), 10);
-
-                        textField.putClientProperty(PFX + ".NAME", name);
-                        textField.putClientProperty(PFX + ".OBJECT", o);
-                        flowPanel.add(textField);
-                        flowPanel.add(new JLabel(name, JLabel.LEFT));
-
-                        textField.addKeyListener(new KeyAdapter() {
-                            @Override
-                            public void keyReleased(KeyEvent e) {
-                                try {
-                                    JTextField field = (JTextField)e.getSource();
-                                    String fname = (String)field.getClientProperty(PFX + ".NAME");
-                                    Object fo = field.getClientProperty(PFX + ".OBJECT");
-    
-                                    Utils.parse(fo, fname, field.getText());
-
-                                    if(fo instanceof Node && fname.equals("name")) {
-                                        TreeModelEvent tme = new TreeModelEvent(model, tree.getSelectionPath());
-                                        TreeModelListener[] listeners = model.getTreeModelListeners();
-                                        
-                                        for(TreeModelListener l : listeners) {
-                                            l.treeNodesChanged(tme);
-                                        }
-                                    }
-                                } catch(Exception ex) {
-                                }
-                            }
-                        });
-                    }
-                    editorPanel.add(flowPanel);
-                } catch(Exception ex) {
-                    ex.printStackTrace(System.out);
-                }
-            } else if(boolean.class.isAssignableFrom(type) && !Modifier.isStatic(m) && !Modifier.isFinal(m)) {
-                try {
-                    JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-                    JCheckBox checkBox = new JCheckBox(name, (Boolean)field.get(o));
-
-                    checkBox.putClientProperty(PFX + ".NAME", name);
-                    checkBox.putClientProperty(PFX + ".OBJECT", o);
-
-                    flowPanel.add(checkBox);
-                    editorPanel.add(flowPanel);
-
-                    checkBox.addItemListener((e) -> {
-                        JCheckBox cb = (JCheckBox)e.getSource();
-                        String fname = (String)cb.getClientProperty(PFX + ".NAME");
-                        Object fo = cb.getClientProperty(PFX + ".OBJECT");
-
-                        try {
-                            Utils.parse(fo, fname, (cb.isSelected()) ? "true" : "false");
-                        } catch(Exception ex) {
-                            ex.printStackTrace(System.out);
-                        }
-                    });
-                } catch(Exception ex) {
-                    ex.printStackTrace(System.out);
-                }
-            } else if(Button.class.isAssignableFrom(type) && !Modifier.isStatic(m)) {
-                JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-                JButton button = new JButton(new AbstractAction(name) {
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        JButton button = (JButton)e.getSource();
-                        String fname = (String)button.getClientProperty(PFX + ".NAME");
-                        Object fo = button.getClientProperty(PFX + ".OBJECT");
-
-                        try {
-                            Button b = (Button)fo.getClass().getField(fname).get(fo);
-
-                            b.onClick();
-                        } catch(Exception ex) {
-                            ex.printStackTrace(System.out);
-                        }
-                    };
-                });
-            
-                button.putClientProperty(PFX + ".NAME", name);
-                button.putClientProperty(PFX + ".OBJECT", o);
-                flowPanel.add(button);
-                editorPanel.add(flowPanel);
-            } else if(type.isEnum() && !Modifier.isStatic(m) && !Modifier.isFinal(m)) {
-                try {
-                    Object[] values = type.getEnumConstants();
-                    String item = Utils.toString(o, name);
-
-                    if(field.getAnnotationsByType(EnumRadioButtons.class).length != 0) {
-                        ButtonGroup group = new ButtonGroup();
-                        JRadioButton selected = null;
-                        JLabel label = new JLabel(name);
-                        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-
-                        labelPanel.add(label);
-                        editorPanel.add(labelPanel);
-                        for(Object v : values) {
-                            JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-                            JRadioButton button = new JRadioButton(new AbstractAction(v.toString()) {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    JRadioButton rb = (JRadioButton)e.getSource();
-                                    String fn = (String)rb.getClientProperty(PFX + ".NAME");
-                                    Object fo = rb.getClientProperty(PFX + ".OBJECT");
-                                    ButtonGroup bg = (ButtonGroup)rb.getClientProperty(PFX + ".GROUP");
-            
-                                    if(bg.getSelection() == rb.getModel()) {
-                                        String v = (String)rb.getClientProperty(PFX + ".VALUE");
-                                        try {
-                                            Utils.parse(fo, fn, v);
-                                        } catch(Exception ex) {
-                                            ex.printStackTrace(System.out);
-                                        }
-                                    }
-                                }
-                            });
-
-                            button.putClientProperty(PFX + ".NAME", name);
-                            button.putClientProperty(PFX + ".OBJECT", o);
-                            button.putClientProperty(PFX + ".GROUP", group);
-                            button.putClientProperty(PFX + ".VALUE", v.toString());
-                            group.add(button);
-                            if(v.toString().equals(item)) {
-                                selected = button;
-                            }
-
-                            flowPanel.add(button);
-                            editorPanel.add(flowPanel);
-                        }
-                        if(selected != null) {
-                            selected.setSelected(true);
-                        }
-                    } else {
-                        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-                        JComboBox<Object> combo = new JComboBox<>();
-
-                        for(Object v : values) {
-                            combo.addItem(v);
-                        }
-                        combo.putClientProperty(PFX + ".NAME", name);
-                        combo.putClientProperty(PFX + ".OBJECT", o);
-                        for(int i = 0; i != values.length; i++) {
-                            String v = values[i].toString();
-
-                            if(v.equals(item)) {
-                                combo.setSelectedIndex(i);
-                                break;
-                            }
-                        }
-
-                        flowPanel.add(combo);
-                        flowPanel.add(new JLabel(name, JLabel.LEFT));
-                        editorPanel.add(flowPanel);
-
-                        combo.addItemListener((e) -> {
-                            JComboBox<Object> cb = (JComboBox<Object>)e.getSource();
-                            String fname = (String)cb.getClientProperty(PFX + ".NAME");
-                            Object fo = cb.getClientProperty(PFX + ".OBJECT");
-
-                            try {
-                                Utils.parse(fo, fname, cb.getSelectedItem().toString());
-                            } catch(Exception ex) {
-                                ex.printStackTrace(System.out);
-                            }
-                        });
-                    }
-                } catch(Exception ex) {
-                    ex.printStackTrace(System.out);
-                }
-            }
-        }
-    }
+   
 
     private void createScene() {
         Object r = JOptionPane.showInputDialog(frame, "Scene Name", "");
