@@ -18,7 +18,6 @@ public class Node implements Iterable<Node> {
     public boolean collidable = false;
     public boolean dynamic = false;
     public boolean isLight = false;
-    public boolean isSpotLight = false;
     public boolean receivesShadow = true;
     public boolean castsShadow = true;
     public final Vector3f position = new Vector3f();
@@ -33,8 +32,9 @@ public class Node implements Iterable<Node> {
     public final Vector4f ambientColor = new Vector4f(0.15f, 0.15f, 0.15f, 1);
     public final Vector4f diffuseColor = new Vector4f(1, 1, 1, 1);
     public final Vector4f lightColor = new Vector4f(1, 1, 1, 1);
-    public float lightShadowOffset = 5;
-    public float lightSpotCutOffDegrees = 45;
+    public final Vector4f lightMapColor = new Vector4f(1, 1, 1, 1);
+    public boolean overrideSceneLightMapColor = false;
+    public boolean lightMapEnabled = false;
     public Texture texture = null;
     public Texture decal = null;
     public float lightRadius = 300;
@@ -91,7 +91,9 @@ public class Node implements Iterable<Node> {
     }
 
     public void clearComponents() {
-        components.clear();
+        while(!components.isEmpty()) {
+            components.get(0).remove();
+        }
     }
 
      public int getTriangleCount() {
@@ -162,20 +164,6 @@ public class Node implements Iterable<Node> {
         while(!children.isEmpty()) {
             children.firstElement().detach();
         }
-    }
-
-    public Matrix4f calcLightProjection(Matrix4f matrix) {
-        return matrix.identity().perspective((float)Math.toRadians(lightSpotCutOffDegrees * 2), 1, 1, lightRadius);
-    }
-
-    public Matrix4f calcLightView(Matrix4f matrix) {
-        return matrix.identity().lookAt(
-            absolutePosition.x, absolutePosition.y, absolutePosition.z,
-            absolutePosition.x - rotation.m10(), 
-            absolutePosition.y - rotation.m11(),
-            absolutePosition.z - rotation.m12(),
-            rotation.m00(), rotation.m01(), rotation.m02()
-        );
     }
 
     public void calcBoundsAndTransform() {

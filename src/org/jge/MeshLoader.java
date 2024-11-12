@@ -48,24 +48,23 @@ public class MeshLoader implements AssetLoader {
                 }
                 Mesh.MeshPart meshPart = keyedMeshParts.get(material);
                 int bV = meshPart.vertices.size();
-                int tris = tokens.length - 3;
+                int[] polygon = new int[tokens.length - 1];
+                
                 for (int i = 1; i != tokens.length; i++) {
                     String[] iTokens = tokens[i].split("[/]+");
                     int vI = Integer.parseInt(iTokens[0]) - 1;
                     int tI = Integer.parseInt(iTokens[1]) - 1;
                     int nI = Integer.parseInt(iTokens[2]) - 1;
-                    VertexPTN vertex = new VertexPTN();
+                    VertexPT2N vertex = new VertexPT2N();
 
                     vertex.position.set(vList.get(vI));
                     vertex.textureCoordinate.set(tList.get(tI));
                     vertex.normal.set(nList.get(nI));
                     meshPart.vertices.add(vertex);
+
+                    polygon[i - 1] = bV + (i - 1);
                 }
-                for (int i = 0; i != tris; i++) {
-                    meshPart.indices.add(bV);
-                    meshPart.indices.add(bV + i + 1);
-                    meshPart.indices.add(bV + i + 2);
-                }
+                meshPart.addPolygon(polygon);
             }
         }
         Enumeration<String> keys = keyedMeshParts.keys();

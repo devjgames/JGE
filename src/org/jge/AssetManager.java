@@ -19,7 +19,6 @@ public class AssetManager extends Resource {
         registerAssetLoader(".png", new Texture.Loader());
         registerAssetLoader(".wav", new SoundLoader());
         registerAssetLoader(".obj", new MeshLoader());
-        registerAssetLoader(".md2", new MD2MeshLoader());
     }
 
     @SuppressWarnings("unchecked")
@@ -57,8 +56,6 @@ public class AssetManager extends Resource {
             }
         }
         assets.clear();
-
-        Game.getInstance().getSceneRenderer().clearShadowTargets();
     }
 
     @Override

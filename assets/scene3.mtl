@@ -1,7 +1,7 @@
-# Blender 4.1.1 MTL File: 'maps.blend'
+# Blender 4.1.1 MTL File: 'models.blend'
 # www.blender.org
 
-newmtl Material
+newmtl Stone2
 Ns 1000.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.000000 0.000000 0.000000

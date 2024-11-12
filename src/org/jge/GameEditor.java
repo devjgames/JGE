@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -37,8 +36,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -378,32 +375,6 @@ public class GameEditor implements org.jge.Game.GameLoop {
                 }
             }
         }));
-        menu.add(new JMenuItem(new AbstractAction("Add MD2 Mesh") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                File file = Utils.selectFile(frame, IO.file("assets"), ".md2");
-
-                if(file != null) {
-                    Node parent = selected;
-                    Node node = new Node();
-
-                    if(parent == null) {
-                        parent = scene.root;
-                    }
-
-                    try {
-                        node.renderable = game.getAssets().load(file);
-                        node.renderable = node.renderable.newInstance();
-                        parent.addChild(node);
-                    } catch(Exception ex) {
-                        ex.printStackTrace(System.out);
-                    }
-                    populateTree();
-                    select(node);
-                    enableUI();
-                }
-            }
-        }));
         menu.add(new JMenuItem(new AbstractAction("Add Node") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -655,17 +626,9 @@ public class GameEditor implements org.jge.Game.GameLoop {
             if(scene.isInDesign()) {
                 handleInput();
             } else {
-                File f = scene.getLoadFile();
-
-                if(f != null) {
-                    try {
-                        scene = null;
-                        game.getAssets().clear();
-                        scene = SceneSerializer.deserialize(false, f);
-                    } catch(Exception ex) {
-                        ex.printStackTrace(System.out);
-                        enableUI();
-                    }
+                scene = Scene.next(scene);
+                if(scene == null) {
+                    enableUI();
                 }
             }
         }
@@ -873,86 +836,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
             selected = null;
             tree.clearSelection();
         } else {
-            JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-            JButton button = new JButton(new AbstractAction("texture") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    File file = Utils.selectFile(frame, IO.file("assets"), ".png");
 
-                    try {
-                        if(file == null) {
-                            selected.texture = null;
-                        } else {
-                            loadTextureFile = file;
-                        }
-                    } catch(Exception ex) {
-                        ex.printStackTrace(System.out);
-                    }
-                }
-            });
-            flowPanel.add(button);
-            editorPanel.add(flowPanel);
-
-            flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-            button = new JButton(new AbstractAction("decal") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    File file = Utils.selectFile(frame, IO.file("assets"), ".png");
-
-                    try {
-                        if(file == null) {
-                            selected.decal = null;
-                        } else {
-                            loadDecalFile = file;
-                        }
-                    } catch(Exception ex) {
-                        ex.printStackTrace(System.out);
-                    }
-                }
-            });
-            flowPanel.add(button);
-            editorPanel.add(flowPanel);
-
-            MD2Mesh mesh = null;
-
-            if(selected.renderable instanceof MD2Mesh) {
-                mesh = (MD2Mesh)selected.renderable;
-            }
-
-            if(mesh != null) {
-                JTextField seqField = new JTextField(
-                    "" + 
-                    mesh.getStart() + " " +
-                    mesh.getEnd() + " " +
-                    mesh.getSpeed() + " " +
-                    ((mesh.isLooping()) ? "1" : "2"),
-                    10);
-
-                flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
-                flowPanel.add(seqField);
-                flowPanel.add(new JLabel("Sequence", JLabel.LEFT));
-                editorPanel.add(flowPanel);
-
-                seqField.addKeyListener(new KeyAdapter() {
-                    @Override
-                    public void keyReleased(KeyEvent e) {
-                        JTextField fld = (JTextField)e.getSource();
-                        String[] tokens = fld.getText().split("\\s+");
-
-                        if(tokens.length == 4) {
-                            try {
-                                int start = Integer.parseInt(tokens[0]);
-                                int end = Integer.parseInt(tokens[1]);
-                                int speed = Integer.parseInt(tokens[2]);
-                                int looping = Integer.parseInt(tokens[3]);
-
-                                ((MD2Mesh)selected.renderable).setSequence(start, end, speed, (looping == 0) ? false : true);
-                            } catch(NumberFormatException ex) {
-                            }
-                        }
-                    }
-                });
-            }
         }
 
         editorPane.addFields(o, tree, model, Node.class);

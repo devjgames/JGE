@@ -10,10 +10,8 @@ public class App {
 
         new GameEditor(800, 500, true, true,
             Player.class,
-            Rotator.class,
             Torch.class,
-            Map.class,
-            NPC.class
+            Drip.class
         );
     }
 }

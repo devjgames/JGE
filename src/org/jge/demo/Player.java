@@ -3,11 +3,8 @@ package org.jge.demo;
 import org.jge.Collider;
 import org.jge.Game;
 import org.jge.IO;
-import org.jge.MD2Mesh;
-import org.jge.Node;
 import org.jge.NodeComponent;
 import org.jge.Resource;
-import org.jge.Sound;
 import org.jge.SpriteRenderer;
 import org.jge.Texture;
 import org.jge.Triangle;
@@ -31,6 +28,10 @@ public class Player extends NodeComponent {
     private final float[] time = new float[1];
     private boolean down = false;
 
+    public Collider getCollider() {
+        return collider;
+    }
+
     @Override
     public void init() throws Exception {
         if(scene().isInDesign()) {
@@ -43,34 +44,6 @@ public class Player extends NodeComponent {
 
         scene().target.set(node().position);
         scene().target.add(o, scene().eye);
-
-        if(node().getChildCount() != 0) {
-            Node child = node().getChild(0);
-            MD2Mesh mesh;
-
-            if(child.renderable instanceof MD2Mesh) {
-                mesh = (MD2Mesh)child.renderable;
-
-                mesh.setSequence(0, 39, 10, true);
-
-                child.rotation
-                .identity()
-                .rotate((float)Math.toRadians(-90), 1, 0, 0)
-                .translate(0, 0, -mesh.getBounds().min.z - collider.radius);
-            }
-        }
-
-        collider.collisionListener = (n, t) -> {
-            if(t.tag == 256) {
-                Sound sound = Game.getInstance().getAssets().load(IO.file("assets/items/collect.wav"));
-
-                sound.setVolume(0.75f);
-                sound.play(false);
-
-                n.visible = false;
-                n.collidable = false;
-            }
-        };
     }
 
     @Override
@@ -94,19 +67,9 @@ public class Player extends NodeComponent {
             scene().rotate(Game.getInstance().dX() * 0.025f, Game.getInstance().dY() * 0.025f);
         }
 
-        boolean moving = false;
         float x = Game.getInstance().w() / 2 - Game.getInstance().mouseX();
         float y = Game.getInstance().mouseY() - Game.getInstance().h() / 2;
         float l = Vector2f.length(x, y);
-        MD2Mesh mesh = null;
-
-        if(node().getChildCount() != 0) {
-            Node child = node().getChild(0);
-
-            if(child.renderable instanceof MD2Mesh) {
-                mesh = (MD2Mesh)child.renderable;
-            }
-        }
 
         collider.velocity.mul(0, 1, 0);  
         scene().target.sub(scene().eye, f);
@@ -125,15 +88,7 @@ public class Player extends NodeComponent {
                 radians = (float)Math.PI * 2 - radians;
             }
             node().rotation.identity().rotate(radians, 0, 1, 0);
-
-            moving = true;
-        }
-        if(mesh != null) {
-            if(moving) {
-                mesh.setSequence(40, 45, 8, true);
-            } else {
-                mesh.setSequence(0, 39, 10, true);
-            }
+            node().getChild(0).rotate(2, (float)Math.toRadians(-360 * Game.getInstance().elapsedTime()));
         }
         collider.velocity.y -= gravity * Game.getInstance().elapsedTime();
         collider.resolve(scene(), scene().root, node().position);
@@ -154,16 +109,12 @@ public class Player extends NodeComponent {
     @Override
     public void renderSprites() throws Exception {
         Texture font = Game.getInstance().getAssets().load(IO.file("assets/font.png"));
-        Texture icon = Game.getInstance().getAssets().load(IO.file("assets/player_i.png"));
         SpriteRenderer renderer = Game.getInstance().getRenderer(SpriteRenderer.class);
 
         renderer.beginSprite(font);
         renderer.push(
             "FPS = " + Game.getInstance().frameRate() + ", RES = " + Resource.getInstances() + ", TRI = " + Game.getInstance().getSceneRenderer().getTrianglesRendered() + 
             ", TESTED = " + collider.getTested(), 8, 12, 100, 5, 10, 10, 1, 1, 1, 1);
-        renderer.endSprite();
-        renderer.beginSprite(icon);
-        renderer.push(0, 0, icon.w, icon.h, 10, Game.getInstance().h() - 10 - icon.h * 2, icon.w * 2, icon.h * 2, 1, 1, 1, 1, false);
         renderer.endSprite();
     }
 

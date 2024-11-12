@@ -3,21 +3,24 @@ package org.jge;
 import java.io.File;
 import java.util.Vector;
 
+import org.joml.Vector4f;
+
 public class Mesh implements Renderable {
 
     public static class MeshPart {
 
         public Texture texture = null;
         public Texture decal = null;
-        public final Vector<VertexPTN> vertices = new Vector<>();
+        public final Vector<VertexPT2N> vertices = new Vector<>();
         public final Vector<Integer> indices = new Vector<>();
+        public final Vector<int[]> polygons = new Vector<>();
         public final AABB bounds = new AABB();
 
-        private final VertexPTN vertex = new VertexPTN();
+        private final VertexPT2N vertex = new VertexPT2N();
 
         public void calcBounds() {
             bounds.clear();
-            for(VertexPTN v : vertices) {
+            for(VertexPT2N v : vertices) {
                 bounds.add(v.position);
             }
         }
@@ -25,6 +28,7 @@ public class Mesh implements Renderable {
         public void addVertex(float x, float y, float z, float s, float t, float nx, float ny, float nz) throws Exception {
             vertex.position.set(x, y, z);
             vertex.textureCoordinate.set(s, t);
+            vertex.textureCoordinate2.set(0, 0);
             vertex.normal.set(nx, ny, nz);
             if(vertex.normal.length() > 0.0000001) {
                 vertex.normal.normalize();
@@ -40,6 +44,7 @@ public class Mesh implements Renderable {
                 this.indices.add(indices[i + 1]);
                 this.indices.add(indices[i + 2]);
             }
+            polygons.add(indices.clone());
         }
     }
 
@@ -96,25 +101,34 @@ public class Mesh implements Renderable {
     }
 
     @Override
-    public int renderShadowPass(Scene scene, Node node, Node light) throws Exception {
-        ShadowRenderer renderer = Game.getInstance().getRenderer(ShadowRenderer.class);
-
-        for(MeshPart part : parts) {
-            renderer.begin(node, light);
-            renderer.push(part.vertices, part.indices, part.indices.size());
-            renderer.end();
-        }
-        return getTriangleCount();
-    }
-
-    @Override
     public int render(Scene scene, Node node, Vector<Node> lights) throws Exception {
-        LightRenderer renderer = Game.getInstance().getRenderer(LightRenderer.class);
+        if(!node.lightMapEnabled) {
+            LightRenderer renderer = Game.getInstance().getRenderer(LightRenderer.class);
 
-        for(MeshPart part : parts) {
-            renderer.begin(scene.projection, scene.view, node.model, node.modelIT, lights, part.texture, part.decal, node.receivesShadow, node.ambientColor, node.diffuseColor);
-            renderer.push(part.vertices, part.indices, part.indices.size());
-            renderer.end();
+            for(MeshPart part : parts) {
+                renderer.begin(scene.projection, scene.view, node.model, node.modelIT, lights, part.texture, part.decal, node.receivesShadow, node.ambientColor, node.diffuseColor);
+                renderer.push(part.vertices, part.indices, part.indices.size());
+                renderer.end();
+            }
+        } else {
+            DualTextureRenderer renderer = Game.getInstance().getRenderer(DualTextureRenderer.class);
+            Texture texture2 = null;
+            Vector4f color = scene.lightMapColor;
+
+            if(node.overrideSceneLightMapColor) {
+                color = node.lightMapColor;
+            }
+            
+            File file = IO.file(scene.file.getParentFile(), IO.getFilenameWithoutExtension(scene.file) + ".png");
+
+            if(file.exists()) {
+                texture2 = Game.getInstance().getAssets().load(file);
+            }
+            for(MeshPart part : parts) {
+                renderer.begin(scene.projection, scene.view, node.model, part.texture, texture2, part.decal, color);
+                renderer.push(part.vertices, part.indices, part.indices.size());
+                renderer.end();
+            }
         }
         return getTriangleCount();
     }

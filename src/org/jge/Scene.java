@@ -14,6 +14,7 @@ public class Scene {
     public final Vector3f eye = new Vector3f(100, 100, 100);
     public final Vector3f target = new Vector3f(0, 0, 0);
     public final Vector3f up = new Vector3f(0, 1, 0);
+    public final Vector4f lightMapColor = new Vector4f(1, 1, 1, 1);
     public float fovDegrees = 60;
     public float zNear = 1;
     public float zFar = 25000;
@@ -23,6 +24,19 @@ public class Scene {
     public final Node root = new Node();
     public final File file;
     public int snap = 1;
+    public float sampleRadius = 32;
+    public int samples = 64;
+    public int lightMapWidth = 128;
+    public int lightMapHeight = 128;
+    public final Button buildLightMap = new Button() {
+        @Override
+        public void onClick() {
+            rebuildLightMap = true;
+        }
+    };
+
+    boolean rebuildLightMap = false;
+    boolean calcLightMap = true;
 
     private final Matrix4f m = new Matrix4f();
     private final Vector3f f = new Vector3f();
@@ -95,5 +109,21 @@ public class Scene {
         eye.sub(target, d);
         d.normalize(d.length() + amount);
         target.add(d, eye);
+    }
+
+    public static Scene next(Scene scene) {
+        File f = scene.getLoadFile();
+        Game game = Game.getInstance();
+
+        if(f != null) {
+            try {
+                scene = null;
+                game.getAssets().clear();
+                scene = SceneSerializer.deserialize(false, f);
+            } catch(Exception ex) {
+                ex.printStackTrace(System.out);
+            }
+        }
+        return scene;
     }
 }

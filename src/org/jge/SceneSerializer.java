@@ -48,23 +48,6 @@ public class SceneSerializer {
                     Renderable renderable = Game.getInstance().getAssets().load(IO.file(element.getAttribute("renderable")));
 
                     node.renderable = renderable.newInstance();
-
-                    MD2Mesh mesh = null;
-
-                    if(node.renderable instanceof MD2Mesh) {
-                        mesh = (MD2Mesh)node.renderable;
-                    }
-
-                    if(mesh != null && element.hasAttribute("sequence")) {
-                        String[] tokens = element.getAttribute("sequence").split("\\s+");
-
-                        mesh.setSequence(
-                            Integer.parseInt(tokens[0]),
-                            Integer.parseInt(tokens[1]),
-                            Integer.parseInt(tokens[2]),
-                            Boolean.parseBoolean(tokens[3])
-                        );
-                    }
                 } catch(Exception ex) {
                     ex.printStackTrace(System.out);
                 }
@@ -174,19 +157,7 @@ public class SceneSerializer {
             File file = node.renderable.getFile();
 
             if(file != null) {
-                MD2Mesh md2Mesh = null;
-
-                if(node.renderable instanceof MD2Mesh) {
-                    md2Mesh = (MD2Mesh)node.renderable;
-                }
-
                 b.append(" renderable=\"" + file.getPath() + "\"");
-                if(md2Mesh != null) {
-                    b.append(
-                        " sequence=\"" + 
-                        md2Mesh.getStart() + " " + md2Mesh.getEnd() + " " + md2Mesh.getSpeed() + " " + md2Mesh.isLooping() + "\""
-                        );
-                }
             }
         }
         if(node.texture != null) {

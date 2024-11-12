@@ -1,7 +1,7 @@
 # Blender 4.1.1
 # www.blender.org
-mtllib dungeon.mtl
-o Cube
+mtllib scene1.mtl
+o Cube.002
 v 128.000000 256.000000 -128.000000
 v 128.000000 0.000000 -128.000000
 v 128.000000 256.000000 128.000000
