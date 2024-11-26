@@ -84,6 +84,10 @@ public class Scene {
     }
 
     public void move(Vector3f point, float dx, float dy) {
+        move(point, dx, dy, null);
+    }
+
+    public void move(Vector3f point, float dx, float dy, Matrix4f transform) {
         float dl = Vector2f.length(dx, dy);
 
         eye.sub(target, f);
@@ -93,14 +97,24 @@ public class Scene {
         if(f.length() > 0.0000001 && dl > 0.0001) {
             f.normalize().cross(u.set(0, 1, 0), r).normalize();
             f.mul(dy).add(r.mul(dx));
+            if(transform != null) {
+                f.mulDirection(transform);
+            }
             point.add(f);
         }
         target.add(d, eye);
     }
 
     public void move(Vector3f point, float dy) {
+        move(point, dy, null);
+    }
+
+    public void move(Vector3f point, float dy, Matrix4f transform) {
         eye.sub(target, d);
         u.set(0, dy, 0);
+        if(transform != null) {
+            u.mulDirection(transform);
+        }
         point.add(u);
         target.add(d, eye);
     }

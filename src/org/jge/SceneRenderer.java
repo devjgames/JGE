@@ -306,6 +306,12 @@ public class SceneRenderer {
                 gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_CLAMP_TO_EDGE);
                 gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_CLAMP_TO_EDGE);
                 gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
+            } catch(Exception ex) {
+                ex.printStackTrace(System.out);
+
+                BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+
+                ImageIO.write(image, "PNG", file);
             } finally {
                 scene.calcLightMap = false;
                 scene.rebuildLightMap = false;

@@ -25,6 +25,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import com.jogamp.opengl.GL2;
@@ -106,6 +107,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private Icon addIcon;
     private boolean toggleSync;
     private EditorPane editorPane;
+    private final Matrix4f matrix = new Matrix4f();
 
     public GameEditor(int w, int h, boolean resizable, boolean fixedFrameRate, Class<?> ... componentFactories) throws Exception {
 
@@ -689,10 +691,11 @@ public class GameEditor implements org.jge.Game.GameLoop {
                     enableUI();
                 }
             } else if(selected != null) {
+                matrix.set(selected.getParent().model).invert();
                 if(mode == MOVXZ) {
-                    scene.move(selected.position, -game.dX(), -game.dY());
+                    scene.move(selected.position, -game.dX(), -game.dY(), matrix);
                 } else if(mode == MOVY) {
-                    scene.move(selected.position, -game.dY());
+                    scene.move(selected.position, -game.dY(), matrix);
                 } else if(mode == RX) {
                     selected.rotate(0, game.dX() * 0.02f);
                 } else if(mode == RY) {
