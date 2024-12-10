@@ -90,6 +90,7 @@ public class Node implements Iterable<Node> {
         visible = node.visible;
         castsShadow = node.castsShadow;
         receivesShadow = node.receivesShadow;
+        name = node.name;
 
         texture = node.texture;
         texture2 = node.texture2;

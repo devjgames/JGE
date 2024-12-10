@@ -9,6 +9,8 @@ import org.jge.Texture;
 import org.jge.demo.scenes.Scene1;
 import org.jge.demo.scenes.Scene2;
 import org.jge.demo.scenes.Scene3;
+import org.jge.demo.scenes.Scene4;
+import org.jge.demo.scenes.Scene5;
 import org.lwjgl.glfw.GLFW;
 
 public class App {
@@ -114,7 +116,9 @@ public class App {
         run(1000, 550, true, 
             new Scene1(),
             new Scene2(),
-            new Scene3()
+            new Scene3(),
+            new Scene4(),
+            new Scene5()
         );
     }
 }
