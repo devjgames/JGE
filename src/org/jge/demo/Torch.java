@@ -19,7 +19,7 @@ public class Torch extends NodeComponent {
     public void init() throws Exception {
         ParticleSystem particles = new ParticleSystem(100);
 
-        node().texture = Game.getInstance().getAssets().load(IO.file("assets/particle.png"));
+        particles.texture = Game.getInstance().getAssets().load(IO.file("assets/particle.png"));
         node().renderable = particles;
 
         node().depthState = DepthState.READONLY;

@@ -35,8 +35,6 @@ public class Node implements Iterable<Node> {
     public final Vector4f lightMapColor = new Vector4f(1, 1, 1, 1);
     public boolean overrideSceneLightMapColor = false;
     public boolean lightMapEnabled = false;
-    public Texture texture = null;
-    public Texture decal = null;
     public float lightRadius = 300;
     public DepthState depthState = DepthState.READWRITE;
     public CullState cullState = CullState.BACK;
@@ -66,9 +64,6 @@ public class Node implements Iterable<Node> {
     public Node(Scene scene, Node node) throws Exception {
         if(node.renderable != null) {
             renderable = node.renderable.newInstance();
-        }
-        if(node.texture != null) {
-            texture = Game.getInstance().getAssets().load(node.texture.file);
         }
         Utils.copy(node, this);
         for(Node child : node) {

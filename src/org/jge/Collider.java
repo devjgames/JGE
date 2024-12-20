@@ -14,6 +14,7 @@ public class Collider {
     
     public float radius = 16;
     public int groundSlope = 60;
+    public int roofSlope = 50;
     public final Vector3f velocity = new Vector3f();
     public CollisionListener collisionListener = null;
 
@@ -28,6 +29,7 @@ public class Collider {
     private final AABB bounds = new AABB();
     private final Triangle triangle = new Triangle();
     private boolean onGround = false;
+    private boolean hitRoof = false;
     private final Matrix4f groundMatrix = new Matrix4f();
     private final Vector3f delta = new Vector3f();
     private final Vector3f hNormal = new Vector3f();
@@ -39,6 +41,10 @@ public class Collider {
 
     public boolean isOnGround() {
         return onGround;
+    }
+
+    public boolean didHitRoof() {
+        return hitRoof;
     }
 
     public int getTested() {
@@ -153,6 +159,15 @@ public class Collider {
                 return false;
             });
             if(hNode != null) {
+                if(Math.acos(Math.max(-0.999f, Math.min(0.999f, hNormal.dot(0, 1, 0)))) < Math.toRadians(groundSlope)) {
+                    groundNormal.add(hNormal);
+                    onGround = true;
+                    velocity.y = 0;
+                }
+                if(Math.acos(Math.max(-0.999f, Math.min(0.999f, hNormal.dot(0, -1, 0)))) < Math.toRadians(roofSlope)) {
+                    hitRoof = true;
+                    velocity.y = 0;
+                }
                 if(Math.acos(Math.max(-0.999f, Math.min(0.999f, hNormal.dot(0, 1, 0)))) < Math.toRadians(groundSlope)) {
                     groundNormal.add(hNormal);
                     onGround = true;

@@ -8,7 +8,8 @@ import org.joml.Vector3f;
 
 public class ParticleSystem implements Renderable {
     
-      public final Vector3f emitPosition = new Vector3f();
+    public final Vector3f emitPosition = new Vector3f();
+    public Texture texture = null;
 
     private float[] particles;
     private float[] temp;
@@ -172,7 +173,7 @@ public class ParticleSystem implements Renderable {
     public int render(Scene scene, Node node, Vector<Node> lights) throws Exception {
         ColorRenderer renderer = Game.getInstance().getRenderer(ColorRenderer.class);
 
-        renderer.begin(scene.projection, scene.view, node.model, node.texture);
+        renderer.begin(scene.projection, scene.view, node.model, texture);
         renderer.push(vertices, indices, particleCount * 6);
         renderer.end();
 

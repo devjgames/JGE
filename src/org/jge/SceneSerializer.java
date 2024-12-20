@@ -50,21 +50,7 @@ public class SceneSerializer {
                     node.renderable = renderable.newInstance();
                 } catch(Exception ex) {
                     ex.printStackTrace(System.out);
-                }
-            }
-            if(element.hasAttribute("texture")) {
-                try {
-                    node.texture = Game.getInstance().getAssets().load(IO.file(element.getAttribute("texture")));
-                } catch(Exception ex) {
-                    ex.printStackTrace(System.out);
-                }
-            }
-            if(element.hasAttribute("decal")) {
-                try {
-                    node.decal = Game.getInstance().getAssets().load(IO.file(element.getAttribute("decal")));
-                } catch(Exception ex) {
-                    ex.printStackTrace(System.out);
-                }
+                } 
             }
             for(int i = 0; i != nodes.getLength(); i++) {
                 org.w3c.dom.Node xmlNode = nodes.item(i);
@@ -159,12 +145,6 @@ public class SceneSerializer {
             if(file != null) {
                 b.append(" renderable=\"" + file.getPath() + "\"");
             }
-        }
-        if(node.texture != null) {
-            b.append(" texture=\"" + node.texture.file + "\"");
-        }
-        if(node.decal != null) {
-            b.append(" decal=\"" + node.decal.file + "\"");
         }
         append(node, empty, b);
         if(!empty) {

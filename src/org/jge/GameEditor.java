@@ -451,8 +451,6 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private AABB bounds = new AABB();
     private Vector3f point = new Vector3f();
     private File loadSceneFile = null;
-    private File loadTextureFile = null;
-    private File loadDecalFile = null;
     private File loadMeshFile = null;
     private File loadKeyFrameMeshFile = null;
     private File playSceneFile = null;
@@ -908,22 +906,6 @@ public class GameEditor implements org.jge.Game.GameLoop {
             populateTree();
             select(null);
             enableUI();
-        } else if(loadTextureFile != null && selected != null) {
-            try {
-                selected.texture = game.getAssets().load(loadTextureFile);
-            } catch(Exception ex) {
-                ex.printStackTrace(System.out);
-            } finally {
-                loadTextureFile = null;
-            }
-        } else if(loadDecalFile != null && selected != null) {
-            try {
-                selected.decal = game.getAssets().load(loadDecalFile);
-            } catch(Exception ex) {
-                ex.printStackTrace(System.out);
-            } finally {
-                loadDecalFile = null;
-            }
         } else if(loadMeshFile != null) {
             Node node = null;
             try {

@@ -19,6 +19,7 @@ public class Player extends NodeComponent {
     public float length = 200;
     public float speed = 100;
     public float gravity = 2000;
+    public int jump = 0;
 
     private final Vector3f f = new Vector3f();
     private final Vector3f o = new Vector3f();
@@ -61,6 +62,10 @@ public class Player extends NodeComponent {
             }
         } else {
             down = false;
+        }
+
+        if(Game.getInstance().keyDown(KeyEvent.VK_SPACE) && collider.isOnGround() && jump > 0) {
+            collider.velocity.y = jump;
         }
 
         if(Game.getInstance().buttonDown(2)) {
