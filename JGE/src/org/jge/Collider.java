@@ -168,11 +168,6 @@ public class Collider {
                     hitRoof = true;
                     velocity.y = 0;
                 }
-                if(Math.acos(Math.max(-0.999f, Math.min(0.999f, hNormal.dot(0, 1, 0)))) < Math.toRadians(groundSlope)) {
-                    groundNormal.add(hNormal);
-                    onGround = true;
-                    velocity.y = 0;
-                }
                 position.set(rPosition);
                 collided = true;
                 if(collisionListener != null) {
