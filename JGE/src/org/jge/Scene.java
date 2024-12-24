@@ -28,6 +28,7 @@ public class Scene {
     public int samples = 64;
     public int lightMapWidth = 128;
     public int lightMapHeight = 128;
+    public boolean lightMapParellelograms = true;
     public final Button buildLightMap = new Button() {
         @Override
         public void onClick() {

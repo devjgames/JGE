@@ -1,4 +1,4 @@
-package org.quest;
+package org.quest.components;
 
 import org.jge.Game;
 import org.jge.Mesh;

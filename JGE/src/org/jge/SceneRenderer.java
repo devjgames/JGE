@@ -207,7 +207,7 @@ public class SceneRenderer {
                                 v.textureCoordinate2.set(s, t);
                             }
 
-                            boolean isPar = polygon.length == 4;
+                            boolean isPar = polygon.length == 4 && scene.lightMapParellelograms;
 
                             if(isPar) {
                                 VertexPT2N v4 = part.vertices.get(polygon[3]);

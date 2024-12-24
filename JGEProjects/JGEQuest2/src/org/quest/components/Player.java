@@ -1,4 +1,4 @@
-package org.quest;
+package org.quest.components;
 
 import java.io.File;
 

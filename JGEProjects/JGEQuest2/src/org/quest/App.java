@@ -3,6 +3,10 @@ package org.quest;
 import org.jge.GameEditor;
 import org.jge.Utils;
 import org.jge.demo.Drip;
+import org.quest.components.FireLight;
+import org.quest.components.Player;
+import org.quest.components.Sky;
+import org.quest.components.Warp;
 
 public class App {
     
@@ -13,7 +17,8 @@ public class App {
             Drip.class,
             Player.class,
             Warp.class,
-            FireLight.class
+            FireLight.class,
+            Sky.class
         );
     }
 }
