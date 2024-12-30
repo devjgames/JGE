@@ -5,6 +5,7 @@ import org.jge.Utils;
 import org.jge.demo.Torch;
 import org.quest.components.Door;
 import org.quest.components.Item;
+import org.quest.components.MapBuilder;
 import org.quest.components.Player;
 
 public class App {
@@ -16,7 +17,8 @@ public class App {
             Torch.class,
             Item.class,
             Player.class,
-            Door.class
+            Door.class,
+            MapBuilder.class
         );
     }
 }

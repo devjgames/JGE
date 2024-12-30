@@ -38,6 +38,7 @@ public class Scene {
 
     boolean rebuildLightMap = false;
     boolean calcLightMap = true;
+    boolean refreshSceneTree = false;
 
     private final Matrix4f m = new Matrix4f();
     private final Vector3f f = new Vector3f();
@@ -64,6 +65,10 @@ public class Scene {
 
     public File getLoadFile() {
         return loadFile;
+    }
+
+    public void refreshSceneTree() {
+        refreshSceneTree = true;
     }
 
     public void calcBoundsAndTransform() {

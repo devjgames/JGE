@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -260,15 +261,18 @@ public class Utils {
 
     private static void appendFiles(File directory, String extension, Vector<Object> paths) {
         File[] files = directory.listFiles();
+        HashSet<String> kfmFiles = new HashSet<>();
 
         if(files != null) {
             for(File file : files) {
                 if(file.isFile() && IO.getExtension(file).equals(extension)) {
                     paths.add(file.getPath());
+                } else if(extension.equals(".obj") && IO.getExtension(file).equals(".kfm")) {
+                    kfmFiles.add(IO.getFilenameWithoutExtension(file));
                 }
             }
             for(File file : files) {
-                if(file.isDirectory()) {
+                if(file.isDirectory() && !kfmFiles.contains(IO.getFilenameWithoutExtension(file))) {
                     appendFiles(file, extension, paths);
                 }
             }

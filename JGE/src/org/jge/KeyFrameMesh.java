@@ -14,15 +14,13 @@ public class KeyFrameMesh implements Renderable {
             String[] lines = new String(IO.readAllBytes(file)).split("\\n+");
             Vector<Mesh> frames = new Vector<>();
             Texture texture = null;
-            File directory = null;
+            File directory = IO.file(file.getParentFile(), IO.getFilenameWithoutExtension(file));
 
             for(String line : lines) {
                 String tLine = line.trim();
 
                 if(tLine.startsWith("texture ")) {
                     texture = assets.load(IO.file(file.getParentFile(), tLine.substring(7).trim()));
-                } else if(tLine.startsWith("frames ")) {
-                    directory = IO.file(file.getParentFile(), tLine.substring(6).trim());
                 }
             }
 
@@ -128,6 +126,9 @@ public class KeyFrameMesh implements Renderable {
     @Override
     public void update(Scene scene, Node node) throws Exception {
         if(done) {
+            if(node.looping) {
+                reset();
+            }
             return;
         }
 

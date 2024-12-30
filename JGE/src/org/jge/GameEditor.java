@@ -460,6 +460,7 @@ public class GameEditor implements org.jge.Game.GameLoop {
     private boolean toggleSync;
     private EditorPane editorPane;
     private final Matrix4f matrix = new Matrix4f();
+    private boolean skipTreeSelectionEvent = false;
 
     public GameEditor(int w, int h, boolean resizable, boolean fixedFrameRate, Class<?> ... componentFactories) throws Exception {
 
@@ -706,12 +707,18 @@ public class GameEditor implements org.jge.Game.GameLoop {
             TreePath path = tree.getSelectionPath();
 
             if(path != null) {
-                Object c = path.getLastPathComponent();
+                try {
+                    if(!skipTreeSelectionEvent) {
+                        Object c = path.getLastPathComponent();
 
-                if(c instanceof DefaultMutableTreeNode) {
-                    DefaultMutableTreeNode tree = (DefaultMutableTreeNode)c;
-                    
-                    selected = (Node)tree.getUserObject();
+                        if(c instanceof DefaultMutableTreeNode) {
+                            DefaultMutableTreeNode tree = (DefaultMutableTreeNode)c;
+                            
+                            selected = (Node)tree.getUserObject();
+                        }
+                    }
+                } finally {
+                    skipTreeSelectionEvent = false;
                 }
             }
             enableUI();
@@ -881,6 +888,23 @@ public class GameEditor implements org.jge.Game.GameLoop {
 
     @Override
     public void render() throws Exception {
+        if(scene != null) {
+            try {
+                if(scene.refreshSceneTree) {
+                    TreePath path = tree.getSelectionPath();
+
+                    skipTreeSelectionEvent = true;
+
+                    populateTree();
+
+                    skipTreeSelectionEvent = true;
+
+                    tree.setSelectionPath(path);
+                }
+            } finally {
+                scene.refreshSceneTree = false;
+            }
+        }
         if(loadSceneFile != null) {
             try {
                 game.getAssets().clear();
