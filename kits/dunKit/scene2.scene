@@ -1,0 +1,10 @@
+# name x y z rx ry rz ux uy uz fx fy fz
+roomDoor.obj 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 toon
+# name x y z rx ry rz ux uy uz fx fy fz
+player -74.0 25.0 -7.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 toon
+# name x y z rx ry rz ux uy uz fx fy fz
+torch 0.0 29.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 100
+# name x y z rx ry rz ux uy uz fx fy fz
+axis 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+coins.obj -41.0 0.0 41.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 

@@ -1,0 +1,58 @@
+# name x y z rx ry rz ux uy uz fx fy fz
+sky.obj 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+grass.obj 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+torch 0.0 1075.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 10000
+# name x y z rx ry rz ux uy uz fx fy fz
+stone.obj -16.0 16.0 16.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+axis 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+grass-corner.obj 144.0 0.0 -32.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+stone.obj 96.0 16.0 16.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+stone.obj 192.0 16.0 -48.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+grass.obj 176.0 0.0 -192.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+stone.obj 160.0 16.0 -176.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+grass.obj 64.0 32.0 -192.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+stone.obj 48.0 48.0 -176.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+grass-corner.obj -80.0 32.0 -160.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+stone.obj -32.0 48.0 -176.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+stone.obj -128.0 48.0 -112.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+gem.obj -48.0 56.0 -128.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+gem.obj 80.0 56.0 -176.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+gem.obj 192.0 24.0 -80.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+gem.obj 176.0 24.0 8.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+rock.obj -64.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+rock.obj -128.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+rock.obj -192.0 32.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+rock.obj -192.0 32.0 -64.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+rock.obj -192.0 80.0 -128.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+rock.obj -240.0 96.0 -176.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+grass.obj -320.0 96.0 -176.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+stone.obj -336.0 112.0 -160.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+gem.obj -336.0 120.0 -192.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+# name x y z rx ry rz ux uy uz fx fy fz
+player 0.0 64.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
