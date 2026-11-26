@@ -35,7 +35,7 @@ public class GameNodeSelector implements TriangleSelector {
     }
 
     @Override
-    public void select(AABB bounds, Object userData, Visitor vistitor) {
+    public void select(AABB bounds, Object userData, Visitor visitor) {
         if(enabled) {
             try {
                 Object obj = node.getRoot().data.get(meshName);
@@ -44,12 +44,12 @@ public class GameNodeSelector implements TriangleSelector {
                     KeyFrameMesh mesh = (KeyFrameMesh)obj;
 
                     mesh.getMesh().calcBoundsAndTransform(node);
-                    mesh.getMesh().select(bounds, userData, vistitor);
+                    mesh.getMesh().select(bounds, userData, visitor);
                 } else if(obj instanceof Mesh) {
                     Mesh mesh = (Mesh)obj;
 
                     mesh.calcBoundsAndTransform(node);
-                    mesh.select(bounds, userData, vistitor);
+                    mesh.select(bounds, userData, visitor);
                 }
             } catch(Exception ex) {
                 Log.getInstance().put(0, ex);

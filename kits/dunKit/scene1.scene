@@ -1,58 +1,16 @@
 # name x y z rx ry rz ux uy uz fx fy fz
-axis 261.0 0.0 -375.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+roomDoor1.obj 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
 # name x y z rx ry rz ux uy uz fx fy fz
-roomDoor.obj 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+hallDoor.obj 128.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
 # name x y z rx ry rz ux uy uz fx fy fz
-side.obj 256.0 0.0 0.0 0.0 0.0 -1.0 0.0 1.0 0.0 1.0 0.0 0.0 
+hallEnd.obj 192.0 0.0 0.0 0.0 0.0 -1.0 0.0 1.0 0.0 1.0 0.0 0.0 scene2.scene
 # name x y z rx ry rz ux uy uz fx fy fz
-hallRamp.obj 256.0 0.0 64.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+torch 64.0 48.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 100
 # name x y z rx ry rz ux uy uz fx fy fz
-hallRamp.obj 256.0 0.0 -64.0 -1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 -1.0 
+coins.obj 32.0 0.0 64.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
 # name x y z rx ry rz ux uy uz fx fy fz
-hallDoor.obj 256.0 -16.0 -320.0 0.0 0.0 1.0 0.0 1.0 0.0 -1.0 0.0 0.0 
+coins.obj 32.0 0.0 -32.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
 # name x y z rx ry rz ux uy uz fx fy fz
-hallDoor.obj 256.0 -16.0 320.0 0.0 0.0 -1.0 0.0 1.0 0.0 1.0 0.0 0.0 
+axis 123.0 0.0 4.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
 # name x y z rx ry rz ux uy uz fx fy fz
-door.obj 64.0 0.0 0.0 0.0 0.0 -1.0 0.0 1.0 0.0 1.0 0.0 0.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-door.obj 256.0 -16.0 -256.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-door.obj 256.0 -16.0 256.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-torch 192.0 16.0 304.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 150
-# name x y z rx ry rz ux uy uz fx fy fz
-torch 320.0 16.0 448.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 150
-# name x y z rx ry rz ux uy uz fx fy fz
-torch 272.0 16.0 176.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 100
-# name x y z rx ry rz ux uy uz fx fy fz
-torch 256.0 16.0 -176.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 100
-# name x y z rx ry rz ux uy uz fx fy fz
-torch 336.0 16.0 -320.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 150
-# name x y z rx ry rz ux uy uz fx fy fz
-torch 192.0 16.0 -448.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 150
-# name x y z rx ry rz ux uy uz fx fy fz
-torch 272.0 16.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 100
-# name x y z rx ry rz ux uy uz fx fy fz
-torch 112.0 16.0 16.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 75
-# name x y z rx ry rz ux uy uz fx fy fz
-torch 16.0 16.0 -80.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 150
-# name x y z rx ry rz ux uy uz fx fy fz
-torch -127.0 16.0 64.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 150
-# name x y z rx ry rz ux uy uz fx fy fz
-coins.obj -99.0 0.0 45.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-coins.obj 240.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-coins.obj 186.0 -16.0 365.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-coins.obj 257.0 -16.0 451.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-coins.obj 256.0 -16.0 -208.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-coins.obj 190.0 -16.0 -396.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-Monster 256.0 -16.0 384.0 -1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 -1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-Monster 256.0 -16.0 -384.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
-# name x y z rx ry rz ux uy uz fx fy fz
-player -64.0 32.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 toon
+player 0.0 31.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 toon

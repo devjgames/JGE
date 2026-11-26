@@ -13,6 +13,7 @@ import org.game.GameSystem;
 import org.game.GameSystem2;
 import org.game.PostProcess;
 import org.game.IOHelper;
+import org.game.Log;
 import org.game.Resource;
 import org.game.Shader;
 import org.game.SoundEngine;
@@ -27,6 +28,7 @@ public class Player extends Model implements ContactHandler {
 
     public static final int COLLIDABLE_DEFAULT = 0;
     public static final int COLLIDABLE_DEATH = 1;
+    public static final int COLLIDABLE_COLLECT = 2;
 
     private static boolean start = false;
 
@@ -38,13 +40,17 @@ public class Player extends Model implements ContactHandler {
     private Vec3 f = new Vec3();
     private Vec3 d = new Vec3();
     private SoundEngine.Sound death;
+    private SoundEngine.Sound steps;
+    private SoundEngine.Sound collect;
     private File loadFile = null;
-    private float seconds = 0;
-    private boolean dead = false;
-    private PostProcess post = null;
+    private float seconds;
+    private boolean dead;
+    private boolean port;
+    private String portName;
+    private PostProcess post;
     
     public Player() {
-        super("axis.obj", false);
+        super("", "axis.obj");
     }
 
     @Override
@@ -59,10 +65,6 @@ public class Player extends Model implements ContactHandler {
         ));
 
         ((GameSystem2)gs).setPost(null);
-
-        if(gs.inDesign()) {
-            return;
-        }
 
         collider.selectors.clear();
         collider.handler = this;
@@ -80,16 +82,24 @@ public class Player extends Model implements ContactHandler {
             }
         }
 
+        if(gs.inDesign()) {
+            return;
+        }
+
         gs.eye.set(node.position);
         gs.eye.add(node.r, gs.target);
         gs.up.set(node.u);
 
-        gs.game.setMouseGrabbed(true);
+        death = gs.game.getResources().load(new File("sounds", "death.wav"));
+        steps = gs.game.getResources().load(new File("sounds", "steps.wav"));
+        collect = gs.game.getResources().load(new File("sounds", "collect.wav"));
 
-        death = gs.game.getResources().load(new File("death.wav"));
         loadFile = null;
         seconds = 0;
         dead = false;
+        port = false;
+
+        gs.game.setMouseGrabbed(true);
 
         start = false;
         
@@ -130,10 +140,10 @@ public class Player extends Model implements ContactHandler {
             return ;
         }
 
-        if(dead) {
+        if(dead || port) {
             seconds += gs.game.getElapsedTime();
             if(seconds >= 1) {
-                loadFile = new File(new File("kits", "dunKit"), gs.getSceneName());
+                loadFile = new File(new File("kits", "dunKit"), (port) ? portName : gs.getSceneName());
             }
             return;
         }
@@ -186,14 +196,32 @@ public class Player extends Model implements ContactHandler {
 
     @Override
     public void contactMade(TriangleSelector selector, Triangle triangle) {
-        if(selector instanceof GameNodeSelector) {
-            GameNodeSelector gns = (GameNodeSelector)selector;
+        try {
+            if(selector instanceof GameNodeSelector) {
+                GameNodeSelector gns = (GameNodeSelector)selector;
 
-            if(gns.getTag() == Player.COLLIDABLE_DEATH) {
-                death.setVolume(0.5f);
-                death.play(false);
-                dead = true;
+                if(gns.getTag() == Player.COLLIDABLE_DEATH) {
+                    death.setVolume(0.5f);
+                    death.play(false);
+                    dead = true;
+                } else if(gns.getTag() == Player.COLLIDABLE_COLLECT) {
+                    gns.getNode().data.put("visible", false);
+                    gns.setEnabled(false);
+                    collect.setVolume(0.5f);
+                    collect.play(false);
+                } else {
+                    String value = (String)gns.getNode().data.get("value");
+
+                    if(value.startsWith("scene")) {
+                        port = true;
+                        portName = value;
+                        steps.setVolume(0.5f);
+                        steps.play(false);
+                    }
+                }
             }
+        } catch(Exception ex) {
+            Log.getInstance().put(0, ex);
         }
     }
 

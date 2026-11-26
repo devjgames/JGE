@@ -10,14 +10,12 @@ import org.game.demos.Main.Kit;
 
 public class DunKit extends Kit {
 
-    @Override
+    @Override 
     public void run() throws Exception {
         Game game = null;
 
         try {
             game = new Game(900, 600, "JGE", true);
-
-            game.getResources().setRoot(new File("kits", "dunKit"));
 
             game.getResources().setLoader((file, extension) -> {
                 if(file.isDirectory()) {
@@ -26,25 +24,34 @@ public class DunKit extends Kit {
                 return null;
             });
 
+            game.getResources().setRoot(new File("kits", "dunKit"));
+
             GameSystem gs = new GameSystem2(
                 "scene1.scene", true, true,
                 new Torch(4, 2, 0, 1),
-                new Model("coins.obj", false),
-                new Model("corner.obj", true),
-                new Model("cornerTall.obj", true),
-                new Model("door.obj", false),
-                new Model("doorWayTall.obj", true),
-                new Model("flat.obj", true),
-                new Model("flatTall.obj", true),
-                new Model("hall.obj", true),
-                new Model("hallDoor.obj", true),
-                new Model("hallRamp.obj", true), 
-                new Model("roomDoor.obj", true), 
-                new Model("side.obj", true),
-                new Model("sideTall.obj", true),
+                new Model("models", "coins.obj"),
+                new Model("models", "corner.obj"),
+                new Model("models", "door.obj"),
+                new Model("models", "flats.obj"),
+                new Model("models", "hall.obj"),
+                new Model("models", "hallDoor.obj"),
+                new Model("models", "hallEnd.obj"),
+                new Model("models", "hallEndT.obj"), 
+                new Model("models", "hallRamp.obj"), 
+                new Model("models", "hallShort.obj"),
+                new Model("models", "hallDoor.obj"),
+                new Model("models", "roomDoor1.obj"),
+                new Model("models", "roomDoor2.obj"),
+                new Model("models", "bridge.obj"),
+                new Model("models", "lava.obj"),
+                new Model("models", "roomLava1.obj"),
+                new Model("models", "roomLava2.obj"),
+                new Model("models", "orb.obj"),
+                new Model("models", "key.obj"),
+                new Model("models", "heal.obj"),
                 new Axis(),
                 new Player(),
-                new KFModel("Monster")
+                new KFModel("Monster", 0.75f)
             );
 
             game.resetTimer();
@@ -59,5 +66,4 @@ public class DunKit extends Kit {
             }
         }
     }
-    
 }

@@ -16,12 +16,16 @@ import org.game.Vec4;
 
 public class Model extends Collidable {
 
+    private String directory;
     private String meshName;
-    private boolean collidable;
 
-    public Model(String meshName, boolean collidable) {
+    public Model(String directory, String meshName) {
+        this.directory = directory;
         this.meshName = meshName;
-        this.collidable = collidable;
+    }
+
+    public String getDirectory() {
+        return directory;
     }
 
     public String getMeshName() {
@@ -30,35 +34,62 @@ public class Model extends Collidable {
 
     @Override
     public boolean isCollidable() {
-        return collidable;
+        return 
+            !meshName.equals("axis.obj") &&
+            !meshName.equals("coins.obj");
     }
 
     @Override
     public int getCollidableTag() {
-        return Player.COLLIDABLE_DEFAULT;
+        if(meshName.equals("lava.obj")) {
+            return Player.COLLIDABLE_DEATH;
+        } else if(meshName.equals("key.obj") || meshName.equals("heal.obj")) {
+            return Player.COLLIDABLE_COLLECT;
+        } else {
+            return Player.COLLIDABLE_DEFAULT;
+        }
     }
 
     @Override
     public void init(GameSystem gs, GameNode node) throws Exception {
-        Mesh mesh = gs.game.getResources().load(new File(meshName));
+        Mesh mesh;
+        
+        if(directory.isBlank()) {
+            mesh = gs.game.getResources().load(new File(meshName));
+        } else {
+            mesh = gs.game.getResources().load(new File(directory, meshName));
+        }
 
         if(meshName.equals("door.obj")) {
             node.data.put("y", node.position.y);
-        }
-        if(meshName.equals("axis.obj")) {
+        } else if(meshName.equals("axis.obj")) {
             mesh.put(MeshLoader.AMBIENT_COLOR, new Vec4(1, 1, 1, 1));
             mesh.put(MeshLoader.DIFFUSE_COLOR, new Vec4(1, 1, 1, 1));
             node.scale.mul(0.5f);
+        } else if(meshName.equals("key.obj")) {
+            mesh.put(MeshLoader.AMBIENT_COLOR, new Vec4(1, 1, 1, 1));
+            mesh.put(MeshLoader.DIFFUSE_COLOR, new Vec4(0.5f, 0.5f, 0.5f, 1));
+        } else if(meshName.equals("heal.obj")) {
+            mesh.put(MeshLoader.AMBIENT_COLOR, new Vec4(1, 1, 1, 1));
+            mesh.put(MeshLoader.DIFFUSE_COLOR, new Vec4(1, 1, 1, 1));
+        } else if(meshName.equals("orb.obj")) {
+            mesh.put(MeshLoader.AMBIENT_COLOR, new Vec4(1, 1, 1, 1));
+            mesh.put(MeshLoader.DIFFUSE_COLOR, new Vec4(1, 1, 1, 1));         
+        } else if(meshName.equals("lava.obj")) {
+            mesh.put(MeshLoader.AMBIENT_COLOR, new Vec4(0.25f, 0.25f, 0.25f, 1));
+            mesh.put(MeshLoader.DIFFUSE_COLOR, new Vec4(1, 1, 1, 1));
         } else {
             mesh.put(MeshLoader.AMBIENT_COLOR, new Vec4(0.4f, 0.4f, 0.4f, 1));
             mesh.put(MeshLoader.DIFFUSE_COLOR, new Vec4(1, 1, 1, 1));
         }
         node.data.put("mesh", mesh);
+        node.data.put("value", node.value);
+        node.data.put("visible", true);
     }
 
     @Override
     public void update(GameSystem gs, GameNode node) throws Exception {
-        if(gs.inDesign()) {
+        if(gs.inDesign() || !(Boolean)node.data.get("visible")) {
             return;
         }
 
@@ -74,6 +105,8 @@ public class Model extends Collidable {
             float y = (Float)node.data.get("y");
 
             node.position.y = y - a * 150;
+        } else if(getCollidableTag() == Player.COLLIDABLE_COLLECT) {
+            node.rotate(1, 45 * gs.game.getElapsedTime());
         }
     }
 
@@ -93,6 +126,9 @@ public class Model extends Collidable {
         }
         if(renderPass != RenderPass.SOLID) {
             return;
+        }
+        if((Boolean)node.data.get("visible") == false) {
+            return ;
         }
 
         Mesh mesh = (Mesh)node.data.get("mesh");
@@ -116,7 +152,14 @@ public class Model extends Collidable {
                     br2.setDecal(null);
 
                     basicRenderer.setLightingEnabled(true);
-                    br2.setWarp(false, 0, 0, 0, false);
+
+                    if(meshName.equals("lava.obj")) {
+                        br2.setWarp(true, gs.game.getTotalTime() * 2, 4, 0.1f, true);
+                    } else if(meshName.equals("orb.obj")) {
+                        br2.setWarp(true, gs.game.getTotalTime() * 2, 1, 0.35f, true);
+                    } else {
+                        br2.setWarp(false, 0, 0, 0, false);
+                    }
 
                     basicRenderer.draw(part.vertexBuffer, part.vertexElementBuffer);
                 }

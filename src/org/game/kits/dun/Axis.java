@@ -6,7 +6,7 @@ import org.game.GameSystem;
 public class Axis extends Model {
     
     public Axis() {
-        super("axis.obj", false);
+        super("", "axis.obj");
     }
 
     @Override

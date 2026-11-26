@@ -1,10 +1,6 @@
 package org.game;
 
-import java.util.UUID;
-
 public class MeshPart extends TaggedResource implements TriangleSelector {
-
-    public static final UUID TRANSPARENT_COLLIDABLE = UUID.randomUUID();
 
     public final VertexArrayBuffer vertexBuffer;
     public final VertexElementBuffer vertexElementBuffer;
@@ -72,33 +68,30 @@ public class MeshPart extends TaggedResource implements TriangleSelector {
 
     @Override
     public void select(AABB bounds, Object userData, Visitor visitor) {
-        if(get(TRANSPARENT_COLLIDABLE) == null) {
-            if(this.bounds.touches(bounds)) {
-                for(int i = 0; i != vertexElementBuffer.getCount(); i += 3) {
-                    try {
-                        int i1 = vertexElementBuffer.get(i + 0);
-                        int i2 = vertexElementBuffer.get(i + 1);
-                        int i3 = vertexElementBuffer.get(i + 2);
-                        float x1 = vertexBuffer.get(i1 * BasicRenderer.VERTEX_STRIDE + 0);
-                        float y1 = vertexBuffer.get(i1 * BasicRenderer.VERTEX_STRIDE + 1);
-                        float z1 = vertexBuffer.get(i1 * BasicRenderer.VERTEX_STRIDE + 2);
-                        float x2 = vertexBuffer.get(i2 * BasicRenderer.VERTEX_STRIDE + 0);
-                        float y2 = vertexBuffer.get(i2 * BasicRenderer.VERTEX_STRIDE + 1);
-                        float z2 = vertexBuffer.get(i2 * BasicRenderer.VERTEX_STRIDE + 2);
-                        float x3 = vertexBuffer.get(i3 * BasicRenderer.VERTEX_STRIDE + 0);
-                        float y3 = vertexBuffer.get(i3 * BasicRenderer.VERTEX_STRIDE + 1);
-                        float z3 = vertexBuffer.get(i3 * BasicRenderer.VERTEX_STRIDE + 2);
+        if(this.bounds.touches(bounds)) {
+            for(int i = 0; i != vertexElementBuffer.getCount(); i += 3) {
+                try {
+                    int i1 = vertexElementBuffer.get(i + 0);
+                    int i2 = vertexElementBuffer.get(i + 1);
+                    int i3 = vertexElementBuffer.get(i + 2);
+                    float x1 = vertexBuffer.get(i1 * BasicRenderer.VERTEX_STRIDE + 0);
+                    float y1 = vertexBuffer.get(i1 * BasicRenderer.VERTEX_STRIDE + 1);
+                    float z1 = vertexBuffer.get(i1 * BasicRenderer.VERTEX_STRIDE + 2);
+                    float x2 = vertexBuffer.get(i2 * BasicRenderer.VERTEX_STRIDE + 0);
+                    float y2 = vertexBuffer.get(i2 * BasicRenderer.VERTEX_STRIDE + 1);
+                    float z2 = vertexBuffer.get(i2 * BasicRenderer.VERTEX_STRIDE + 2);
+                    float x3 = vertexBuffer.get(i3 * BasicRenderer.VERTEX_STRIDE + 0);
+                    float y3 = vertexBuffer.get(i3 * BasicRenderer.VERTEX_STRIDE + 1);
+                    float z3 = vertexBuffer.get(i3 * BasicRenderer.VERTEX_STRIDE + 2);
 
-                        triangle.p1.set(x1, y1, z1).mulPosition(parent.model);
-                        triangle.p2.set(x2, y2, z2).mulPosition(parent.model);
-                        triangle.p3.set(x3, y3, z3).mulPosition(parent.model);
-                        triangle.calcPlane();
+                    triangle.p1.set(x1, y1, z1).mulPosition(parent.model);
+                    triangle.p2.set(x2, y2, z2).mulPosition(parent.model);
+                    triangle.p3.set(x3, y3, z3).mulPosition(parent.model);
+                    triangle.calcPlane();
 
-                        visitor.visit(triangle, userData);
-
-                    } catch(Exception ex) {
-                        Log.getInstance().put(0, ex);
-                    }
+                    visitor.visit(triangle, userData);
+                } catch(Exception ex) {
+                    Log.getInstance().put(0, ex);
                 }
             }
         }

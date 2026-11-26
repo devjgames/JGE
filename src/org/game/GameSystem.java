@@ -61,9 +61,11 @@ public class GameSystem {
     private boolean down = false;
     private boolean captured = false;
     private boolean updateValueText = false;
+    private String sceneName;
 
     public GameSystem(String sceneName, boolean inDesign, boolean uiEnabled, GameComponent ... factories) throws Exception {
         this.inDesign = inDesign;
+        this.sceneName = sceneName;
 
         game = Game.getInstance();
 
@@ -129,10 +131,7 @@ public class GameSystem {
     }
 
     public final String getSceneName() {
-        if(selectedScene >= 0) {
-            return (String)sceneNames.get(selectedScene);
-        }
-        return null;
+        return sceneName;
     }
 
     public final int getCount() {
@@ -291,6 +290,7 @@ public class GameSystem {
                 selectedScene = i;
                 sceneIndex = i;
                 resetS = false;
+                sceneName = (String)sceneNames.get(selectedScene);
                 load();
             }
             ui.addRow(5);
@@ -397,6 +397,7 @@ public class GameSystem {
             if(game.isKeyDown(Keys.KEY_ESCAPE)) {
                 if(uiEnabled) {
                     inDesign = true;
+                    sceneName = (String)sceneNames.get(selectedScene);
                     load(new File(game.getResources().getRoot(), getSceneName()));
                 } else {
                     game.getResources().destroy();
@@ -542,6 +543,8 @@ public class GameSystem {
         for(int i = 0; i != factoryNames.size(); i++) {
             factories.get(factoryNames.get(i)).finish();
         }
+
+        sceneName = sceneFile.getName();
 
         game.setMouseGrabbed(false);
 

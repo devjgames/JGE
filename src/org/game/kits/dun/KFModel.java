@@ -16,9 +16,11 @@ import org.game.Vec3;
 public class KFModel extends Collidable {
     
     private String meshName;
+    private float ambientIntensity;
 
-    public KFModel(String meshName) {
+    public KFModel(String meshName, float ambientIntensity) {
         this.meshName = meshName;
+        this.ambientIntensity = ambientIntensity;
     }
 
     public String getMeshName() {
@@ -79,7 +81,7 @@ public class KFModel extends Collidable {
                         renderer.setModel(mesh.getMesh().model);
                         renderer.setModelIT(mesh.getMesh().modelIT);
                         renderer.setLightingEnabled(true);
-                        renderer.setAmbientColor(0.5f, 0.5f, 0.5f, 1);
+                        renderer.setAmbientColor(ambientIntensity, ambientIntensity, ambientIntensity, 1);
                         renderer.setDiffuseColor(1, 1, 1, 1);
 
                         BasicRenderer2 br2 = (BasicRenderer2)renderer;

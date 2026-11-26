@@ -107,7 +107,7 @@ public class Model extends Collidable {
         if(renderPass != RenderPass.SOLID) {
             return;
         }
-        if(!(Boolean)node.data.get("visible")) {
+        if((Boolean)node.data.get("visible") == false) {
             return ;
         }
 
