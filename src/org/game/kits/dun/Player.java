@@ -109,7 +109,7 @@ public class Player extends Model implements ContactHandler {
                 shader.set("uBands", 9);
                 shader.set("uBandSoftness", 0.0f);
                 shader.set("uSaturation", 1.0f);
-                shader.set("uEdgeWidth", 1.0f);
+                shader.set("uEdgeWidth", (float)gs.game.getScale());
                 shader.set("uEdgeThreshold", 0.3f);
                 shader.set("uOutlineColor", 0, 0, 0);
 
