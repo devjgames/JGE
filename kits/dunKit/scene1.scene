@@ -11,6 +11,6 @@ coins.obj 32.0 0.0 64.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0
 # name x y z rx ry rz ux uy uz fx fy fz
 coins.obj 32.0 0.0 -32.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
 # name x y z rx ry rz ux uy uz fx fy fz
-axis 123.0 0.0 4.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
+axis 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 
 # name x y z rx ry rz ux uy uz fx fy fz
-player 0.0 31.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 toon
+player -48.0 32.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 toon

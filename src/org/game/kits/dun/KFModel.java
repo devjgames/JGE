@@ -12,15 +12,17 @@ import org.game.MeshLoader;
 import org.game.MeshPart;
 import org.game.RenderPass;
 import org.game.Vec3;
+import org.game.Vec4;
 
 public class KFModel extends Collidable {
+
+    private static final String AMBIENT_COLOR = "ambientColor";
+    private static final String DIFFUSE_COLOR = "diffuseColor";
     
     private String meshName;
-    private float ambientIntensity;
 
-    public KFModel(String meshName, float ambientIntensity) {
+    public KFModel(String meshName) {
         this.meshName = meshName;
-        this.ambientIntensity = ambientIntensity;
     }
 
     public String getMeshName() {
@@ -46,6 +48,14 @@ public class KFModel extends Collidable {
 
         mesh = gs.game.getResources().manage(new KeyFrameMesh(mesh));
         mesh.setSequence(0, mesh.getCount() - 1, 16, true);
+
+        if(meshName.equals("Monster")) {
+            node.data.put(AMBIENT_COLOR, new Vec4(0.65f, 0.65f,0.65f, 1));
+            node.data.put(DIFFUSE_COLOR, new Vec4(1, 1, 1, 1));
+        } else {
+            node.data.put(AMBIENT_COLOR, new Vec4(0.5f, 0.5f,0.5f, 1));
+            node.data.put(DIFFUSE_COLOR, new Vec4(1, 1, 1, 1));
+        }
 
         node.data.put("mesh", mesh);
 
@@ -81,8 +91,9 @@ public class KFModel extends Collidable {
                         renderer.setModel(mesh.getMesh().model);
                         renderer.setModelIT(mesh.getMesh().modelIT);
                         renderer.setLightingEnabled(true);
-                        renderer.setAmbientColor(ambientIntensity, ambientIntensity, ambientIntensity, 1);
-                        renderer.setDiffuseColor(1, 1, 1, 1);
+
+                        renderer.setAmbientColor((Vec4)node.data.get(AMBIENT_COLOR));
+                        renderer.setDiffuseColor((Vec4)node.data.get(DIFFUSE_COLOR));
 
                         BasicRenderer2 br2 = (BasicRenderer2)renderer;
 

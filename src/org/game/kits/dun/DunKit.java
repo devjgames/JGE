@@ -51,7 +51,7 @@ public class DunKit extends Kit {
                 new Model("models", "heal.obj"),
                 new Axis(),
                 new Player(),
-                new KFModel("Monster", 0.75f)
+                new KFModel("Monster")
             );
 
             game.resetTimer();
