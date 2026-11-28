@@ -107,7 +107,7 @@ public class Torch extends GameComponent {
             particle.endY = 0;
             particle.lifeSpan = 0.5f + random.nextFloat() * 1.5f;
 
-            ps.emit(particle, gs);
+            ps.emit(particle, gs.game);
 
             acm -= 1 / 120.0f;
         }
@@ -115,7 +115,7 @@ public class Torch extends GameComponent {
 
         node.calcModel(model);
 
-        ps.update(gs, model);
+        ps.update(gs.game, gs.view, model);
     }
 
     @Override

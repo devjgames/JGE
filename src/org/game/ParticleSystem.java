@@ -1,6 +1,5 @@
 package org.game;
 
-
 public final class ParticleSystem extends Resource {
 
     public Texture texture = null;
@@ -72,8 +71,8 @@ public final class ParticleSystem extends Resource {
         return hit;
     }
 
-    public void update(GameSystem gs, Mat4 model) throws Exception {
-        time = gs.game.getTotalTime();
+    public void update(Game game, Mat4 view, Mat4 model) throws Exception {
+        time = game.getTotalTime();
         int count = 0;
         for(int i = 0; i != this.count; i += 20) {
             float n = (time - particles[i + 18]) / particles[i + 19];
@@ -88,7 +87,7 @@ public final class ParticleSystem extends Resource {
         temp = t;
         this.count = count;
 
-        m.set(gs.view).mul(model);
+        m.set(view).mul(model);
         m.getRow(0, r).normalize();
         m.getRow(1, u).normalize();
         m.getRow(2, f).normalize();
@@ -147,7 +146,7 @@ public final class ParticleSystem extends Resource {
         vertexBuffer.push(r, g, b, a);
     }
     
-    public void emit(Particle particle, GameSystem gs) {
+    public void emit(Particle particle, Game game) {
         if(count != particles.length) {
             particles[count++] = particle.velocityX;
             particles[count++] = particle.velocityY;
@@ -167,7 +166,7 @@ public final class ParticleSystem extends Resource {
             particles[count++] = particle.startY;
             particles[count++] = particle.endX;
             particles[count++]  = particle.endY;
-            particles[count++] = gs.game.getTotalTime();
+            particles[count++] = game.getTotalTime();
             particles[count++] = particle.lifeSpan;
         }
     }
